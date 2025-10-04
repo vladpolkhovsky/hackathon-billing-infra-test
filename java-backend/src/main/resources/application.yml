@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: spring-billing-backend
+
+server:
+  port: 8090
+  servlet:
+    context-path: /api/billing
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    path: /swagger
