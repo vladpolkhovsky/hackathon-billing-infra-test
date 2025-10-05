@@ -3,7 +3,8 @@ spring:
     name: spring-billing-backend
 
 server:
-  port: 8090
+  port: 8091
+  domain: ${DOMAIN:localhost:8091}
   servlet:
     context-path: /api/billing
 
@@ -12,3 +13,7 @@ springdoc:
     enabled: true
   swagger-ui:
     path: /swagger
+    urls:
+      - name: ${server.domain}
+        display-name: server domain
+        url: http://${server.domain}${server.servlet.context-path}/v3/api-docs
