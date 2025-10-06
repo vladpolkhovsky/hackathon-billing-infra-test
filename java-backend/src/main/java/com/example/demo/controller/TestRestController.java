@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +13,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Tag(name = "Тестовый контроллер, авторизации нет.")
 public class TestRestController {
 
     @GetMapping("/v1/test")
+    @Operation(summary = "Получение данных в виде мапы.")
     public ResponseEntity<Map<String, Object>> test() {
         return ResponseEntity.ok(Map.of(
             "status", "ok",
@@ -23,6 +27,7 @@ public class TestRestController {
     }
 
     @GetMapping("/v1/test-with-body")
+    @Operation(summary = "Получение объекта с известной структурой")
     public ResponseEntity<TestBodyResponse> testWithBody() {
         return ResponseEntity.ok(TestBodyResponse.builder()
             .id(System.currentTimeMillis())

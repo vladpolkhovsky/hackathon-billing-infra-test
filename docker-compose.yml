@@ -3,7 +3,7 @@ services:
   nginx:
     image: nginx:latest
     #ВАЖНО: указать переменные из темплейта
-    command: /bin/bash -c "envsubst '$${DOMAIN} $${FRONT_UPSTREAM} $${BILLING_UPSTREAM}' \
+    command: /bin/bash -c "envsubst '$${DOMAIN} $${FRONT_UPSTREAM} $${BILLING_UPSTREAM} $${KAFKA_UI_UPSTREAM}' \
       < /etc/nginx/conf.d/default.conf.template \
       > /etc/nginx/conf.d/default.conf \
       && nginx -g 'daemon off;'"
@@ -47,3 +47,76 @@ services:
     ports:
       - "9000:80"
     restart: always
+
+  postgres:
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
+    command: -c 'max_connections=500'
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
+      TZ: Europe/Moscow
+    healthcheck:
+      interval: 10s
+      retries: 10
+      start_period: 45s
+      test: pg_isready -U postgres
+      timeout: 10s
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - ./postgres/pg-init-db.sql:/docker-entrypoint-initdb.d/postgres-init.sql
+      - pgdata:/var/lib/postgresql/data:rw
+
+  zookeeper:
+    image: bitnamilegacy/zookeeper:3.6.1
+    ports:
+      - "2181"
+    volumes:
+      - zk-data:/bitnami/zookeeper
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    restart: unless-stopped
+
+  kafka:
+    image: bitnamilegacy/kafka:2.5.0
+    ports:
+      - "9093:9093"
+    volumes:
+      - kafka-data:/bitnami/kafka
+    depends_on:
+      - zookeeper
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_HEAP_OPTS=-Xmx256m -Xms256m
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - KAFKA_MAX_MESSAGE_BYTES=3145728
+      - KAFKA_REPLICA_FETCH_MAX_BYTES=3145728
+    restart: unless-stopped
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8051:8080"
+    environment:
+      - DYNAMIC_CONFIG_ENABLED="true"
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - SERVER_SERVLET_CONTEXT_PATH=/kafka-ui
+    volumes:
+      - kafka-ui-data:/etc/kafkaui
+    depends_on:
+      - kafka
+    restart: unless-stopped
+
+volumes:
+  pgdata: { }
+  zk-data: { }
+  kafka-data: { }
+  kafka-ui-data: { }

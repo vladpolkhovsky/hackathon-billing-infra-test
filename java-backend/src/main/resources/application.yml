@@ -34,3 +34,9 @@ springdoc:
       - name: ${server.domain}
         display-name: server domain
         url: http://${server.domain}${server.servlet.context-path}/v3/api-docs
+
+jwt:
+  cookie:
+    name: JWT_TOKEN
+  signing:
+    key: example-jwt-token-signing-key-with-width-more-then-256-bit
