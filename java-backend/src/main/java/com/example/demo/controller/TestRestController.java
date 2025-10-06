@@ -1,7 +1,11 @@
 package com.example.demo.controller;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import com.example.demo.dto.TestBodyResponse;
+import com.example.demo.dto.TestBodyResponse.TestBodyResponsePart;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,5 +20,18 @@ public class TestRestController {
             "code", 200,
             "timestamp", LocalDateTime.now()
         ));
+    }
+
+    @GetMapping("/v1/test-with-body")
+    public ResponseEntity<TestBodyResponse> testWithBody() {
+        return ResponseEntity.ok(TestBodyResponse.builder()
+            .id(System.currentTimeMillis())
+            .uuid(UUID.randomUUID())
+            .name("Test name " + UUID.randomUUID())
+            .parts(List.of(TestBodyResponsePart.builder()
+                .partName("part name " + UUID.randomUUID())
+                .subPartIds(List.of(1L, 2L, 3L))
+                .build()))
+            .build());
     }
 }
