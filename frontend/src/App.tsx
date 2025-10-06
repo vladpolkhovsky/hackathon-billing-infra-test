@@ -13,7 +13,7 @@ function App() {
 
   const testApi = async () => {
     setLoading(true);
-    const { data, error } = await client.GET('/v1/test');
+    const { data, error } = await client.GET('/v1/test-with-body');
     setData(data);
     setError(error);
     setLoading(false);

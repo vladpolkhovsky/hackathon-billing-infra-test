@@ -20,10 +20,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/test-with-body": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["testWithBody"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        TestBodyResponse: {
+            /** Format: int64 */
+            id?: number;
+            /** Format: uuid */
+            uuid?: string;
+            name?: string;
+            parts?: components["schemas"]["TestBodyResponsePart"][];
+        };
+        TestBodyResponsePart: {
+            partName?: string;
+            subPartIds?: number[];
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;
@@ -50,6 +79,26 @@ export interface operations {
                     "*/*": {
                         [key: string]: Record<string, never>;
                     };
+                };
+            };
+        };
+    };
+    testWithBody: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TestBodyResponse"];
                 };
             };
         };
