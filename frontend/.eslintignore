@@ -1,0 +1,12 @@
+.DS_Store
+
+node_modules
+
+dist
+*.html
+
+.env*.local
+
+vite-env.d.ts
+
+src/api.ts
