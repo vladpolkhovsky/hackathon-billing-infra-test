@@ -40,6 +40,22 @@ services:
       start_period: 30s
     restart: always
 
+  python-backend:
+    build:
+      context: ./python-backend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://localhost:8081/actuator/health/liveness" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+
   frontend:
     build:
       context: ./frontend
