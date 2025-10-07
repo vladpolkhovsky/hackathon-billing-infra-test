@@ -2,9 +2,12 @@ FROM amazoncorretto:21-alpine-jdk AS builder
 
 WORKDIR /app
 
-COPY build.gradle.kts settings.gradle.kts gradlew ./
 COPY gradle ./gradle
+COPY gradlew gradlew
+
 RUN chmod +x ./gradlew
+
+COPY build.gradle.kts settings.gradle.kts ./
 
 CMD ./gradlew dependencies
 
