@@ -40,7 +40,8 @@ services:
       start_period: 30s
     restart: always
     depends_on:
-      - liquibase
+      liquibase:
+        condition: service_completed_successfully
 
   frontend:
     build:
@@ -83,7 +84,8 @@ services:
       LIQUIBASE_COMMAND_PASSWORD: postgres
       LIQUIBASE_COMMAND_CHANGELOG_FILE: master.xml
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   zookeeper:
     image: bitnamilegacy/zookeeper:3.6.1
