@@ -8,7 +8,7 @@ function App() {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<any>(null);
   const client = createClient<paths>({
-    baseUrl: 'http://localhost/api/billing',
+    baseUrl: '/api/billing',
   });
 
   const testApi = async () => {
