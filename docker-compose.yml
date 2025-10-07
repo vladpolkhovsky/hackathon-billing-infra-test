@@ -66,7 +66,7 @@ services:
       test: pg_isready -U postgres
       timeout: 10s
     ports:
-      - "5432:5432"
+      - "6000:5432"
     restart: unless-stopped
     volumes:
       - ./postgres/pg-init-db.sql:/docker-entrypoint-initdb.d/postgres-init.sql
@@ -78,7 +78,7 @@ services:
       dockerfile: Dockerfile
     entrypoint: [ "liquibase", "update" ]
     environment:
-      LIQUIBASE_COMMAND_URL: jdbc:postgresql://postgres:5432/billing
+      LIQUIBASE_COMMAND_URL: jdbc:postgresql://postgres:6000/billing
       LIQUIBASE_COMMAND_USERNAME: postgres
       LIQUIBASE_COMMAND_PASSWORD: postgres
       LIQUIBASE_COMMAND_CHANGELOG_FILE: master.xml
