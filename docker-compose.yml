@@ -33,12 +33,14 @@ services:
     ports:
       - "8090:8090"
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:9090/actuator/health/liveness"]
+      test: [ "CMD", "curl", "--fail", "http://localhost:9090/actuator/health/liveness" ]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 30s
     restart: always
+    depends_on:
+      - liquibase
 
   frontend:
     build:
@@ -69,6 +71,19 @@ services:
     volumes:
       - ./postgres/pg-init-db.sql:/docker-entrypoint-initdb.d/postgres-init.sql
       - pgdata:/var/lib/postgresql/data:rw
+
+  liquibase:
+    build:
+      context: ./liquibase
+      dockerfile: Dockerfile
+    entrypoint: [ "liquibase", "update" ]
+    environment:
+      LIQUIBASE_COMMAND_URL: jdbc:postgresql://postgres:5432/billing
+      LIQUIBASE_COMMAND_USERNAME: postgres
+      LIQUIBASE_COMMAND_PASSWORD: postgres
+      LIQUIBASE_COMMAND_CHANGELOG_FILE: master.xml
+    depends_on:
+      - postgres
 
   zookeeper:
     image: bitnamilegacy/zookeeper:3.6.1
