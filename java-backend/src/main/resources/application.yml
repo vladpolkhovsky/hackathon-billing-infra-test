@@ -4,7 +4,7 @@ spring:
 
 server:
   port: 8091
-  domain: ${DOMAIN:localhost:8091}
+  domain: http://localhost:8091
   servlet:
     context-path: /api/billing
 
@@ -40,3 +40,7 @@ jwt:
     name: JWT_TOKEN
   signing:
     key: example-jwt-token-signing-key-with-width-more-then-256-bit
+
+cors:
+  allowed:
+    origins: localhost:5173

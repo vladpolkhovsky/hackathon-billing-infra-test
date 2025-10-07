@@ -1,8 +1,14 @@
 package com.example.demo.config;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import com.example.demo.config.security.JwtAuthenticationFilter;
 import com.example.demo.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+@Slf4j
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
@@ -51,12 +58,26 @@ public class DefaultSecurityConfig {
     }
 
     @Bean
-    public WebMvcConfigurer corsConfigurer() {
+    public WebMvcConfigurer corsConfigurer(
+        @Value("${server.domain}") String domain,
+        @Value("${cors.allowed.origins:}") String allowedOrigins) {
+
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
+                List<String> origins = new ArrayList<>();
+
+                origins.add(domain);
+
+                // Добавляем дополнительные домены из конфигурации
+                if (!StringUtils.isEmpty(allowedOrigins)) {
+                    origins.addAll(Arrays.asList(allowedOrigins.split(",")));
+                }
+
+                log.info("cors allowedOrigins {}", origins);
+
                 registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:5173")
+                    .allowedOrigins(origins.toArray(new String[0]))
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowCredentials(true)
                     .maxAge(3600);
