@@ -8,7 +8,7 @@ function App() {
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<any>(null);
   const client = createClient<paths>({
-    baseUrl: '/api/billing',
+    baseUrl: 'http://localhost/api/billing',
   });
 
   const testApi = async () => {
@@ -24,7 +24,7 @@ function App() {
       <h1>Billing API</h1>
       <h2>Curently only testing endpoint</h2>
       <div className="card">
-        <button onClick={testApi}>{loading ? 'Loading...' : 'Test API'}</button>
+        <button onClick={testApi}>{loading ? 'Loading...' : 'Test '}</button>
         {error && <p>Error: {error.message}</p>}
         {data && <p>Data: {JSON.stringify(data)}</p>}
       </div>
