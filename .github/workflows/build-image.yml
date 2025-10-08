@@ -43,24 +43,21 @@ jobs:
           - postgres
           - liquibase
         include:
-          - service: nginx
-            context: .
-            dockerfile: nginx/Dockerfile
           - service: backend
             context: ./java-backend
-            dockerfile: Dockerfile
+            dockerfile: ./java-backend/Dockerfile
           - service: python-backend
             context: ./python-backend
-            dockerfile: Dockerfile
+            dockerfile: ./python-backend/Dockerfile
           - service: frontend
             context: ./frontend
-            dockerfile: Dockerfile
+            dockerfile: ./frontend/Dockerfile
           - service: postgres
             context: ./postgres
-            dockerfile: Dockerfile
+            dockerfile: ./postgres/Doc kerfile
           - service: liquibase
             context: ./liquibase
-            dockerfile: Dockerfile
+            dockerfile: ./liquibase/Dockerfile
     permissions:
       contents: read
       packages: write
