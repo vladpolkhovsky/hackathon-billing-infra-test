@@ -1,4 +1,4 @@
-name: Build image
+`name: Build image
 on:
   workflow_dispatch:
 
@@ -26,5 +26,5 @@ jobs:
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
         with:
-          github_token: ${{ github.GITHUB_TOKEN }}
-          custom_tag: v${{ github.run_id }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: v${{ github.run_id }}`
