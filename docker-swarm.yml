@@ -15,6 +15,9 @@ services:
       - "443:443"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
         max_attempts: 5
@@ -28,6 +31,9 @@ services:
       - registry-data:/var/lib/registry
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
         max_attempts: 5
@@ -46,6 +52,9 @@ services:
       - REGISTRY_URL=${REGISTRY_DOMAIN}
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
         max_attempts: 5
@@ -72,6 +81,9 @@ services:
       start_period: 30s
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
         max_attempts: 5
@@ -91,6 +103,9 @@ services:
       start_period: 30s
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
         max_attempts: 5
@@ -102,6 +117,9 @@ services:
       - "9000:80"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
         max_attempts: 5
@@ -124,7 +142,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - manager
+          - node.role == manager
       restart_policy:
         condition: on-failure
         max_attempts: 5
@@ -144,6 +162,10 @@ services:
       LIQUIBASE_COMMAND_PASSWORD: postgres
       LIQUIBASE_COMMAND_CHANGELOG_FILE: master.xml
     deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
       restart_policy:
         condition: on-failure
         max_attempts: 5
@@ -163,7 +185,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - manager
+          - node.role == manager
       restart_policy:
         condition: on-failure
         max_attempts: 5
@@ -191,7 +213,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - manager
+          - node.role == manager
       restart_policy:
         condition: on-failure
         max_attempts: 5
@@ -214,7 +236,7 @@ services:
       replicas: 1
       placement:
         constraints:
-          - manager
+          - node.role == manager
       restart_policy:
         condition: on-failure
         max_attempts: 5
