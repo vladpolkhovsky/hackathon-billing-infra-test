@@ -54,7 +54,7 @@ jobs:
             dockerfile: ./frontend/Dockerfile
           - service: postgres
             context: ./postgres
-            dockerfile: ./postgres/Doc kerfile
+            dockerfile: ./postgres/Dockerfile
           - service: liquibase
             context: ./liquibase
             dockerfile: ./liquibase/Dockerfile
