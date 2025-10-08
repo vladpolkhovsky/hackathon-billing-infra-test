@@ -63,6 +63,11 @@ services:
       LIQUIBASE_COMMAND_USERNAME: postgres
       LIQUIBASE_COMMAND_PASSWORD: postgres
       LIQUIBASE_COMMAND_CHANGELOG_FILE: master.xml
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 15s
     depends_on:
       [ "postgres" ]
 
