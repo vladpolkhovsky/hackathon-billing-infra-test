@@ -1,0 +1,14 @@
+name: Deploy tag to server
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Tag Name
+        id: get_tag_name
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+      - name: Use Tag Name
+        run: |
+          echo "The current tag is: ${{ steps.get_tag_name.outputs.TAG_NAME }}"

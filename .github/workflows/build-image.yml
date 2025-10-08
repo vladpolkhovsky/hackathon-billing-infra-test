@@ -1,0 +1,31 @@
+name: Build image
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [ closed ]
+    branches:
+      - main
+
+jobs:
+  commit-info:
+    runs-on: ubuntu-latest
+    name: Build info
+    steps:
+      - run:
+          echo "Commit hash ${{ github.event.sha }}"
+  create-tag-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/v.${{ github.run_id }}',
+              sha: context.sha
+            })
