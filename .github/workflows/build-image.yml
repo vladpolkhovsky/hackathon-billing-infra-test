@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/github-script@v5
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.token }}
         with:
           script: |
             github.rest.git.createRef({
