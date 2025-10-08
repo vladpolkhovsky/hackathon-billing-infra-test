@@ -3,7 +3,8 @@ services:
   nginx:
     image: umputun/nginx-le:latest
     #ВАЖНО: указать переменные из темплейта
-    command: /bin/bash -c "envsubst '$${DOMAIN} $${FRONT_UPSTREAM} $${BILLING_UPSTREAM} $${KAFKA_UI_UPSTREAM} $${REGISTRY_DOMAIN}' \
+    command: apk add --no-cache bash \
+      /bin/bash -c "envsubst '$${DOMAIN} $${FRONT_UPSTREAM} $${BILLING_UPSTREAM} $${KAFKA_UI_UPSTREAM} $${REGISTRY_DOMAIN}' \
       < /etc/nginx/conf.d/service.conf.template \
       > /etc/nginx/conf.d/service.conf \
       && nginx -g 'daemon off;'"
@@ -14,7 +15,7 @@ services:
       - ./nginx/nginx.prod.tmpl.conf:/etc/nginx/conf.d/service.conf.template
     environment:
       TZ: Europe/Moscow
-      LETSENCRYPT: true
+      LETSENCRYPT: "true"
       LE_EMAIL: ${LE_EMAIL}
       LE_FQDN: ${LE_DOMAIN}
     ports:
@@ -60,8 +61,7 @@ services:
       LIQUIBASE_COMMAND_PASSWORD: postgres
       LIQUIBASE_COMMAND_CHANGELOG_FILE: master.xml
     depends_on:
-      postgres:
-        condition: service_healthy
+      [ "postgres" ]
 
   zookeeper:
     image: bitnamilegacy/zookeeper:3.6.1
