@@ -17,17 +17,14 @@ jobs:
     steps:
       - run:
           echo "Commit hash ${{ github.event.sha }}"
+
   create-tag-version:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v5
-        env:
-          github-token: ${{ github.token }}
+      - uses: actions/checkout@v5
+      - name: Add tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
         with:
-          script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/v.${{ github.run_id }}',
-              sha: context.sha
-            })
+          github_token: ${{ github.GITHUB_TOKEN }}
+          custom_tag: v${{ github.run_id }}
