@@ -13,7 +13,12 @@ services:
       - "80:80"
       - "8080:80"
       - "443:443"
-    restart: always
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 15s
 
   registry:
     image: registry:3
@@ -21,7 +26,12 @@ services:
       - "5000:5000"
     volumes:
       - registry-data:/var/lib/registry
-    restart: always
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 15s
 
   registry-ui:
     image: joxit/docker-registry-ui:main
@@ -34,6 +44,49 @@ services:
       - SINGLE_REGISTRY=true
       - REGISTRY_TITLE=Billing Docker Registry UI
       - REGISTRY_URL=${REGISTRY_DOMAIN}
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 15s
+    depends_on:
+      - registry
+
+  backend:
+    image: docker.vpolkhovsky.net/billing/backend:latest
+    env_file:
+      - .env
+    environment:
+      server.port: 8090
+      management.server.port: 9090
+      server.domain: ${DOMAIN}
+      cors.allowed.origins: http://backend:8090,http://localhost:5173,http://frontend:80
+    ports:
+      - "8090:8090"
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://localhost:9090/actuator/health/liveness" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 15s
+
+  frontend:
+    image: docker.vpolkhovsky.net/billing/frontend:latest
+    ports:
+      - "9000:80"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 15s
 
   postgres:
     image: docker.vpolkhovsky.net/billing/postgres:latest
@@ -48,9 +101,17 @@ services:
       start_period: 45s
       test: pg_isready -U postgres
       timeout: 10s
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - manager
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 15s
     ports:
       - "6000:5432"
-    restart: unless-stopped
     volumes:
       - ./postgres/pg-init-db.sql:/docker-entrypoint-initdb.d/postgres-init.sql
       - pgdata:/var/lib/postgresql/data:rw
@@ -69,7 +130,7 @@ services:
         max_attempts: 5
         delay: 15s
     depends_on:
-      [ "postgres" ]
+      - postgres
 
   zookeeper:
     image: bitnamilegacy/zookeeper:3.6.1
@@ -79,7 +140,15 @@ services:
       - zk-data:/bitnami/zookeeper
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
-    restart: unless-stopped
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - manager
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 15s
 
   kafka:
     image: bitnamilegacy/kafka:2.5.0
@@ -99,7 +168,15 @@ services:
       - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
       - KAFKA_MAX_MESSAGE_BYTES=3145728
       - KAFKA_REPLICA_FETCH_MAX_BYTES=3145728
-    restart: unless-stopped
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - manager
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 15s
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -114,7 +191,15 @@ services:
       - kafka-ui-data:/etc/kafkaui
     depends_on:
       - kafka
-    restart: unless-stopped
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - manager
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        delay: 15s
 
 volumes:
   registry-data: { }
