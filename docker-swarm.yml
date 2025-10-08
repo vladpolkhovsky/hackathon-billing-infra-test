@@ -27,19 +27,13 @@ services:
     image: joxit/docker-registry-ui:main
     restart: always
     ports:
-      - 4444:80
+      - "4444:80"
+    env_file:
+      - .env.prod
     environment:
       - SINGLE_REGISTRY=true
       - REGISTRY_TITLE=Billing Docker Registry UI
-      - DELETE_IMAGES=true
-      - SHOW_CONTENT_DIGEST=true
-      - NGINX_PROXY_PASS_URL=${REGISTRY_DOMAIN}
-      - SHOW_CATALOG_NB_TAGS=true
-      - CATALOG_MIN_BRANCHES=1
-      - CATALOG_MAX_BRANCHES=1
-      - TAGLIST_PAGE_SIZE=100
-      - REGISTRY_SECURED=false
-      - CATALOG_ELEMENTS_LIMIT=1000
+      - REGISTRY_URL=${REGISTRY_DOMAIN}
 
   postgres:
     image: docker.vpolkhovsky.net/billing/postgres:latest
