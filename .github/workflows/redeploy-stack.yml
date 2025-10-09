@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Print branch name
         run: |
-          echo "Current branch: ${GITHUB_REF##*/}"
+          echo "Current branch: ${{ github.ref_name }}
 
       - name: Connect to server
         uses: appleboy/ssh-action@v1
@@ -21,7 +21,7 @@ jobs:
           script: |
             cd /usr/src/hackathon-billing-infra-test
             git fetch origin
-            git checkout origin/${GITHUB_REF##*/} -f
+            git checkout origin/${{ github.ref_name }} -f
 
       - name: Undeploy old stack
         uses: appleboy/ssh-action@v1
