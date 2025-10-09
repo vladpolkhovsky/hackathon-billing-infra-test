@@ -1,0 +1,46 @@
+name: Docker stack redeploy
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print branch name
+        run: |
+          echo "Current branch: ${GITHUB_REF##*/}"
+
+      - name: Connect to server
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            cd /usr/src/hackathon-billing-infra-test
+            git fetch origin
+            git checkout origin/${GITHUB_REF##*/} -f
+
+      - name: Undeploy old stack
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            cd /usr/src/hackathon-billing-infra-test
+            docker stack rm billing-stack
+
+      - name: Deploy new stack
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            cd /usr/src/hackathon-billing-infra-test
+            docker stack deploy -c ./docker-swarm.yml billing-stack
