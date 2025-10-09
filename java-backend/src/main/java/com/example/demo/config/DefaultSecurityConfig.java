@@ -40,6 +40,7 @@ public class DefaultSecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests((authorize) -> authorize
                 .requestMatchers(
+                    "/actuator/**",
                     "/v1/test",
                     "/v1/test-with-body",
                     "/v1/auth/sign-in",
