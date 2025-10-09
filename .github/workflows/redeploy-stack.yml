@@ -31,16 +31,47 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.SSH_PORT || 22 }}
           script: |
-            cd /usr/src/hackathon-billing-infra-test
             docker stack rm billing-stack
 
-      - name: Deploy new stack
+      - name: Deploy and verify stack
         uses: appleboy/ssh-action@v1
+        continue-on-error: true
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.SSH_PORT || 22 }}
           script: |
-            cd /usr/src/hackathon-billing-infra-test
-            docker stack deploy -c ./docker-swarm.yml billing-stack
+            deploy_success=false
+
+            for i in {1..3}; do
+              echo "Attempt $i/3"
+
+              # Деплой
+              if docker stack deploy -c /usr/src/hackathon-billing-infra-test/docker-swarm.yml billing-stack; then
+                echo "✅ Stack deploy command succeeded"
+
+                # Проверяем статус сервисов
+                echo "Checking service status..."
+                sleep 10
+                if docker service ls | grep billing-stack; then
+                  echo "✅ Services are running"
+                  deploy_success=true
+                  break
+                else
+                  echo "❌ Services not found after deploy"
+                fi
+              else
+                echo "❌ Docker stack deploy failed"
+              fi
+
+              echo "Waiting 15 seconds before retry..."
+              sleep 15
+            done
+
+            if [ "$deploy_success" = false ]; then
+              echo "💥 Deployment failed after 3 attempts"
+              exit 1
+            fi
+
+            echo "🎉 Stack deployment completed successfully"
