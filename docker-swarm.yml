@@ -49,7 +49,6 @@ services:
     environment:
       - SINGLE_REGISTRY=true
       - REGISTRY_TITLE=Billing Docker Registry UI
-      - REGISTRY_URL=${REGISTRY_DOMAIN}
     deploy:
       replicas: 1
       placement:
@@ -69,7 +68,6 @@ services:
     environment:
       server.port: 8090
       management.server.port: 9090
-      server.domain: ${DOMAIN}
       cors.allowed.origins: http://backend:8090,http://localhost:5173,http://frontend:80,http://localhost
     ports:
       - "8090:8090"
