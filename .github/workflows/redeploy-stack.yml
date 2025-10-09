@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Print branch name
         run: |
-          echo "Current branch: ${{ github.ref_name }}
+          echo "Current branch: ${{ github.ref_name }}"
 
       - name: Connect to server
         uses: appleboy/ssh-action@v1
