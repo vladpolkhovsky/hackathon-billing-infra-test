@@ -12,3 +12,17 @@ jobs:
       - name: Use Tag Name
         run: |
           echo "The current tag is: ${{ steps.get_tag_name.outputs.TAG_NAME }}"
+
+      - name: Update stack service images
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            docker service update --image docker.vpolkhovsky.net/billing/backend:${{ steps.get_tag_name.outputs.TAG_NAME }} billing-stack_backend
+            docker service update --image docker.vpolkhovsky.net/billing/frontend:${{ steps.get_tag_name.outputs.TAG_NAME }} billing-stack_frontend
+            docker service update --image docker.vpolkhovsky.net/billing/liquibase:${{ steps.get_tag_name.outputs.TAG_NAME }} billing-stack_liquibase
+            docker service update --image docker.vpolkhovsky.net/billing/postgres:${{ steps.get_tag_name.outputs.TAG_NAME }} billing-stack_postgres
+            docker service update --image docker.vpolkhovsky.net/billing/python-backend:${{ steps.get_tag_name.outputs.TAG_NAME }} billing-stack_python-backend
