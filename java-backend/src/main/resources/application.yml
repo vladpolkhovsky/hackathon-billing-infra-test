@@ -1,12 +1,27 @@
 spring:
   application:
     name: spring-billing-backend
+  datasource:
+    url: jdbc:postgresql://localhost:6000/billing
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 5
+      idle-timeout: 15000
+      connection-timeout: 15000
+  jpa:
+    hibernate:
+      ddl-auto: none
 
 server:
   port: 8091
   domain: http://localhost:8091
   servlet:
     context-path: /api/billing
+  tomcat:
+    max-http-form-post-size: 300MB
 
 management:
   endpoint:

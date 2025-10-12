@@ -4,5 +4,5 @@
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
     <!-- changelog/yyyy.MM.dd.hh-MM-changelog.xml   -->
-    <include file="changelog/2025.10.07.17-30-changelog.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/2025.10.12.21-00-changelog.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

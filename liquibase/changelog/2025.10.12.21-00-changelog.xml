@@ -1,0 +1,140 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="create-schema-billing-1" author="vpolkhovsky">
+        <sql>CREATE SCHEMA IF NOT EXISTS billing</sql>
+        <rollback>
+            <sql>DROP SCHEMA billing</sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="create-table-users-1" author="vpolkhovsky">
+        <createTable schemaName="billing" tableName="users">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password_hash" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addDefaultValue schemaName="billing" tableName="users" columnName="id" defaultValueComputed="uuidv7()"/>
+        <addDefaultValue schemaName="billing" tableName="users" columnName="updated_at" defaultValueComputed="now()"/>
+        <addDefaultValue schemaName="billing" tableName="users" columnName="created_at" defaultValueComputed="now()"/>
+
+        <rollback>
+            <dropTable schemaName="billing" tableName="users"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="create-table-roles-1" author="vpolkhovsky">
+        <createTable schemaName="billing" tableName="roles">
+            <column name="name" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable schemaName="billing" tableName="roles"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="initial-fill-roles-table" author="vpolkhovsky">
+        <insert schemaName="billing" tableName="roles">
+            <column name="name" value="SYSTEM_ADMIN"/>
+        </insert>
+        <insert schemaName="billing" tableName="roles">
+            <column name="name" value="MANAGER"/>
+        </insert>
+        <insert schemaName="billing" tableName="roles">
+            <column name="name" value="VIEWER"/>
+        </insert>
+        <rollback>
+            <delete schemaName="billing" tableName="roles">
+                <where>name in ('SYSTEM_ADMIN', 'MANAGER', 'VIEWER')</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="create-role-to-user-table-1" author="vpolkhovsky">
+        <createTable schemaName="billing" tableName="user_roles">
+            <column name="user_id" type="uuid">
+                <constraints primaryKeyName="user_role_pk" primaryKey="true" nullable="false"/>
+            </column>
+            <column name="role_id" type="varchar(255)">
+                <constraints primaryKeyName="user_role_pk" primaryKey="true" nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableSchemaName="billing"
+                                 baseTableName="user_roles"
+                                 baseColumnNames="role_id"
+                                 constraintName="user_role_name_fk"
+                                 referencedTableSchemaName="billing"
+                                 referencedTableName="roles"
+                                 referencedColumnNames="name"/>
+        <addForeignKeyConstraint baseTableSchemaName="billing"
+                                 baseTableName="user_roles"
+                                 baseColumnNames="user_id"
+                                 constraintName="user_role_user_id_fk"
+                                 referencedTableSchemaName="billing"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+
+        <rollback>
+            <dropForeignKeyConstraint baseTableSchemaName="billing"
+                                      baseTableName="user_roles"
+                                      constraintName="user_role_name_fk"/>
+            <dropForeignKeyConstraint baseTableSchemaName="billing"
+                                      baseTableName="user_roles"
+                                      constraintName="user_role_user_id_fk"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="insert-into-users-and-roles" author="vpolkhovsky">
+        <insert tableName="users" schemaName="billing">
+            <column name="id" value="ec283d45-467b-4de2-a433-867943ffb842"/>
+            <column name="username" value="admin"/>
+            <column name="password_hash" value="$2a$12$EmGvPUS/TtjThnpS7iMBXOA53IMtbipapZDYPrXTi/57e3MdpDAX2"/>
+        </insert>
+        <insert tableName="users" schemaName="billing">
+            <column name="id" value="64fa6b3b-dd62-44a1-8653-dc8a7b8859a5"/>
+            <column name="username" value="manager"/>
+            <column name="password_hash" value="$2a$12$sUg5QpUwvQXPfx6ptNvMFOFeyIa5u3vIsRzX3VCXFwK6O4P49OJJe"/>
+        </insert>
+        <insert tableName="users" schemaName="billing">
+            <column name="id" value="9fb1fc1f-0680-4612-b698-3a062906d4d6"/>
+            <column name="username" value="viewer"/>
+            <column name="password_hash" value="$2a$12$en689vRTmARgFt.zMymm5u2PGYE2PcGYtoVGcRMpOVNAoxB4WKG2S"/>
+        </insert>
+
+        <insert tableName="user_roles" schemaName="billing">
+            <column name="role_id" value="VIEWER"/>
+            <column name="user_id" value="9fb1fc1f-0680-4612-b698-3a062906d4d6"/>
+        </insert>
+        <insert tableName="user_roles" schemaName="billing">
+            <column name="role_id" value="MANAGER"/>
+            <column name="user_id" value="64fa6b3b-dd62-44a1-8653-dc8a7b8859a5"/>
+        </insert>
+        <insert tableName="user_roles" schemaName="billing">
+            <column name="role_id" value="SYSTEM_ADMIN"/>
+            <column name="user_id" value="ec283d45-467b-4de2-a433-867943ffb842"/>
+        </insert>
+        <rollback>
+            <delete tableName="user_roles" schemaName="billing">
+                <where>role_id in ('SYSTEM_ADMIN', 'MANAGER', 'VIEWER')</where>
+            </delete>
+            <delete tableName="users" schemaName="billing">
+                <where>username in ('admin', 'manager', 'viewer')</where>
+            </delete>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
