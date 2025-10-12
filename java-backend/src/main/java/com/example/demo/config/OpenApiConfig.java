@@ -14,7 +14,7 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI(@Value("${server.domain}") String domain,
                                  @Value("${server.servlet.context-path}") String contextPath) {
         Server server = new Server();
-        server.setUrl("http://" + domain + contextPath);
+        server.setUrl(domain + contextPath);
         return new OpenAPI().servers(List.of(server));
     }
 }

@@ -23,6 +23,7 @@
 ### Доступные ресурсы на сервере
 
 * ФРОНТ https://faas-billing.vpolkhovsky.net/
+* Billing-service Swagger https://faas-billing.vpolkhovsky.net/api/billing/swagger-ui/index.html 
 * Kafka UI - https://faas-billing.vpolkhovsky.net/kafka-ui/
 * Docker Registry UI - https://docker-ui.vpolkhovsky.net/
 * Swarmpit - http://faas-billing.vpolkhovsky.net:888/ 

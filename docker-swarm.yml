@@ -68,7 +68,7 @@ services:
     environment:
       server.port: 8090
       management.server.port: 9090
-      cors.allowed.origins: http://backend:8090,http://localhost:5173,http://frontend:80,http://localhost
+      cors.allowed.origins: http://backend:8090,http://localhost:5173,http://frontend:80,http://localhost,https://faas-billing.vpolkhovsky.net
     ports:
       - "8090:8090"
     healthcheck:
