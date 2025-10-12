@@ -13,7 +13,7 @@ CMD ./gradlew dependencies
 
 COPY src /app/src
 
-RUN ["./gradlew", "build", "-x", "-test"]
+RUN ["./gradlew", "build", "-x", "test"]
 
 RUN tree
 
