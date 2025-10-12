@@ -22,6 +22,8 @@ services:
         condition: on-failure
         max_attempts: 5
         delay: 15s
+    depends_on:
+      - registry
 
   registry:
     image: registry:3
@@ -89,6 +91,8 @@ services:
         condition: on-failure
         max_attempts: 5
         delay: 15s
+    depends_on:
+      - liquibase
 
   python-backend:
     image: docker.vpolkhovsky.net/billing/python-backend:latest
@@ -111,6 +115,8 @@ services:
         condition: on-failure
         max_attempts: 5
         delay: 15s
+    depends_on:
+      - liquibase
 
   frontend:
     image: docker.vpolkhovsky.net/billing/frontend:latest
@@ -125,6 +131,8 @@ services:
         condition: on-failure
         max_attempts: 5
         delay: 15s
+    depends_on:
+      - registry
 
   postgres:
     image: docker.vpolkhovsky.net/billing/postgres:latest
@@ -153,6 +161,8 @@ services:
     volumes:
       - ./postgres/pg-init-db.sql:/docker-entrypoint-initdb.d/postgres-init.sql
       - pgdata:/var/lib/postgresql/data:rw
+    depends_on:
+      - registry
 
   liquibase:
     image: docker.vpolkhovsky.net/billing/liquibase:latest
