@@ -45,7 +45,7 @@ public class AuthController {
             body.getPasswordConfirmation(), body.getRoles(), creator);
     }
 
-    @GetMapping(value = "/iam", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/iam", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Получение информации о себе. Закрыт за авторизацией")
     public ResponseEntity<UserDto> iam(@AuthenticationPrincipal UserDto user) {
         return ResponseEntity.ok(user);
