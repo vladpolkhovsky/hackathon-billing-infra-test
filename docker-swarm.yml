@@ -69,7 +69,7 @@ services:
       server.port: 8090
       management.server.port: 9090
       cors.allowed.origins: http://backend:8090,http://localhost:5173,http://frontend:80,http://localhost,https://faas-billing.vpolkhovsky.net
-      spring.datasource.url: jdbc:postgresql://localhost:6000/billing
+      spring.datasource.url: jdbc:postgresql://postgres:5432/billing
       spring.datasource.username: postgres
       spring.datasource.password: postgres
     ports:
