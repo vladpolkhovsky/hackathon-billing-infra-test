@@ -3,7 +3,7 @@ services:
   nginx:
     image: nginx:latest
     #ВАЖНО: указать переменные из темплейта
-    command: /bin/bash -c "envsubst '$${DOMAIN} $${FRONT_UPSTREAM} $${BILLING_UPSTREAM} $${KAFKA_UI_UPSTREAM}' \
+    command: /bin/bash -c "envsubst '$${DOMAIN} $${FRONT_UPSTREAM} $${BILLING_UPSTREAM} $${KAFKA_UI_UPSTREAM} $${TELEMETRY_UPSTREAM}' \
       < /etc/nginx/conf.d/default.conf.template \
       > /etc/nginx/conf.d/default.conf \
       && nginx -g 'daemon off;'"
