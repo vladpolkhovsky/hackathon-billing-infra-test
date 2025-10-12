@@ -22,6 +22,7 @@ jobs:
             cd /usr/src/hackathon-billing-infra-test
             git fetch origin
             git checkout ${{ github.ref_name }} -f
+            git pull
 
       - name: Undeploy old stack
         uses: appleboy/ssh-action@v1
