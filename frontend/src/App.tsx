@@ -21,7 +21,7 @@ function App() {
 
   return (
     <>
-      <h1>Billing API V2</h1>
+      <h1>Billing API V2 rita</h1>
       <h2>Curently only testing endpoint</h2>
       <div className="card">
         <button onClick={testApi}>{loading ? 'Loading...' : 'Test '}</button>
