@@ -4,6 +4,40 @@
  */
 
 export interface paths {
+    "/v1/auth/sign-up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Создание учётной записи */
+        post: operations["signUp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/sign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Авторизация (дефолтные admin/admin manager/manager viewer/viewer) */
+        post: operations["signIn"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/test": {
         parameters: {
             query?: never;
@@ -11,6 +45,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Получение данных в виде мапы. */
         get: operations["test"];
         put?: never;
         post?: never;
@@ -27,7 +62,25 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Получение объекта с известной структурой */
         get: operations["testWithBody"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/iam": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получение информации о себе. Закрыт за авторизацией */
+        get: operations["iam"];
         put?: never;
         post?: never;
         delete?: never;
@@ -40,6 +93,37 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        BackendError: {
+            uri?: string;
+            method?: string;
+            message?: string;
+            stacktrace?: string;
+            causeMessage?: string;
+            /** Format: date-time */
+            timestamp?: string;
+        };
+        SignUpRequest: {
+            username?: string;
+            password?: string;
+            passwordConfirmation?: string;
+            roles?: ("SYSTEM_ADMIN" | "MANAGER" | "VIEWER")[];
+        };
+        UserDto: {
+            /** Format: uuid */
+            id?: string;
+            username?: string;
+            roles?: ("SYSTEM_ADMIN" | "MANAGER" | "VIEWER")[];
+            createdAt?: string;
+            updatedAt?: string;
+            accountNonExpired?: boolean;
+            accountNonLocked?: boolean;
+            credentialsNonExpired?: boolean;
+            enabled?: boolean;
+        };
+        SignInRequest: {
+            username?: string;
+            password?: string;
+        };
         TestBodyResponse: {
             /** Format: int64 */
             id?: number;
@@ -61,6 +145,90 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    signUp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignUpRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+        };
+    };
+    signIn: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignInRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+        };
+    };
     test: {
         parameters: {
             query?: never;
@@ -77,8 +245,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": {
-                        [key: string]: Record<string, never>;
+                        [key: string]: unknown;
                     };
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
                 };
             };
         };
@@ -99,6 +285,62 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["TestBodyResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+        };
+    };
+    iam: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
                 };
             };
         };
