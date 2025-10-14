@@ -1,0 +1,37 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: knative-serving
+  namespace: knative-serving
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: activator
+  namespaceSelector:
+    matchNames:
+      - knative-serving
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+      path: /metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: knative-autoscaler
+  namespace: knative-serving
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: autoscaler
+  namespaceSelector:
+    matchNames:
+      - knative-serving
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+      path: /metrics

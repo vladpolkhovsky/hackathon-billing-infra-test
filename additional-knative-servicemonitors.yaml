@@ -1,0 +1,55 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: knative-controller
+  namespace: knative-serving
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: controller
+  namespaceSelector:
+    matchNames:
+      - knative-serving
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: knative-webhook
+  namespace: knative-serving
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: webhook
+  namespaceSelector:
+    matchNames:
+      - knative-serving
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: knative-networking-istio
+  namespace: knative-serving
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: networking-istio
+  namespaceSelector:
+    matchNames:
+      - knative-serving
+  endpoints:
+    - port: http-metrics
+      interval: 30s

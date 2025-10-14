@@ -1,0 +1,72 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+
+    <changeSet id="create-table-functions" author="vpolkhovsky">
+        <createTable schemaName="billing" tableName="functions">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+
+        <addDefaultValue schemaName="billing" tableName="functions" columnName="id" defaultValueComputed="uuidv7()"/>
+        <addDefaultValue schemaName="billing" tableName="functions" columnName="updated_at"
+                         defaultValueComputed="now()"/>
+        <addDefaultValue schemaName="billing" tableName="functions" columnName="created_at"
+                         defaultValueComputed="now()"/>
+
+        <rollback>
+            <dropTable schemaName="billing" tableName="functions"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="create-table-metrics" author="vpolkhovsky">
+        <createTable schemaName="billing" tableName="metrics">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="function_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addDefaultValue schemaName="billing" tableName="metrics" columnName="id" defaultValueComputed="uuidv7()"/>
+        <addDefaultValue schemaName="billing" tableName="metrics" columnName="updated_at" defaultValueComputed="now()"/>
+        <addDefaultValue schemaName="billing" tableName="metrics" columnName="created_at" defaultValueComputed="now()"/>
+
+        <addForeignKeyConstraint baseTableSchemaName="billing"
+                                 baseTableName="metrics"
+                                 baseColumnNames="function_id"
+                                 constraintName="metrics_function_fk"
+                                 referencedTableSchemaName="billing"
+                                 referencedTableName="functions"
+                                 referencedColumnNames="id"/>
+
+        <rollback>
+            <dropTable schemaName="billing" tableName="metrics"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

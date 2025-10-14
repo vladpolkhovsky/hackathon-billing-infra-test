@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: knative-user-services
+  namespace: monitoring
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: queue-proxy
+  podMetricsEndpoints:
+    - port: http-metrics
+      interval: 5s
+      path: /metrics
+    - port: http-autometric
+      interval: 5s
+      path: /metrics
+    - port: http-usermetric
+      interval: 5s
+      path: /metrics
+  namespaceSelector:
+    any: true
