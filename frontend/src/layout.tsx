@@ -3,7 +3,7 @@ import Menu from './components/Menu';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="h-screen w-screen backdrop-blur-2xl">
+    <div className="h-screen w-screen">
       <Header />
       <div className="flex gap-4">
         <Menu />

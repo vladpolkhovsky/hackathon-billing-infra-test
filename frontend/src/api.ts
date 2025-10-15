@@ -4,6 +4,24 @@
  */
 
 export interface paths {
+    "/v1/tariff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получение списка тарифов */
+        get: operations["getFunction"];
+        put?: never;
+        /** Создание тарифа */
+        post: operations["createTariff"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/sign-up": {
         parameters: {
             query?: never;
@@ -38,32 +56,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/test": {
+    "/v1/function": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Получение данных в виде мапы. */
-        get: operations["test"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/test-with-body": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Получение объекта с известной структурой */
-        get: operations["testWithBody"];
+        /** Получение списка функций */
+        get: operations["getFunction_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -89,6 +90,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/tariff/{tariffId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Удаление тарифа */
+        delete: operations["deleteTariff"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -102,11 +120,21 @@ export interface components {
             /** Format: date-time */
             timestamp?: string;
         };
-        SignUpRequest: {
-            username?: string;
-            password?: string;
-            passwordConfirmation?: string;
-            roles?: ("SYSTEM_ADMIN" | "MANAGER" | "VIEWER")[];
+        CreateTariffRequest: {
+            tariffName?: string;
+            cpuPrice?: number;
+            memoryPrice?: number;
+            callPrice?: number;
+        };
+        TariffDto: {
+            id?: string;
+            name?: string;
+            callPrice?: number;
+            cpuPrice?: number;
+            memoryPrice?: number;
+            createdBy?: components["schemas"]["UserDto"];
+            createdAt?: string;
+            updatedAt?: string;
         };
         UserDto: {
             /** Format: uuid */
@@ -115,26 +143,81 @@ export interface components {
             roles?: ("SYSTEM_ADMIN" | "MANAGER" | "VIEWER")[];
             createdAt?: string;
             updatedAt?: string;
+            credentialsNonExpired?: boolean;
             accountNonExpired?: boolean;
             accountNonLocked?: boolean;
-            credentialsNonExpired?: boolean;
             enabled?: boolean;
+        };
+        SignUpRequest: {
+            username?: string;
+            password?: string;
+            passwordConfirmation?: string;
+            roles?: ("SYSTEM_ADMIN" | "MANAGER" | "VIEWER")[];
         };
         SignInRequest: {
             username?: string;
             password?: string;
         };
-        TestBodyResponse: {
+        PageTariffDto: {
             /** Format: int64 */
-            id?: number;
-            /** Format: uuid */
-            uuid?: string;
-            name?: string;
-            parts?: components["schemas"]["TestBodyResponsePart"][];
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["TariffDto"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            first?: boolean;
+            last?: boolean;
+            empty?: boolean;
         };
-        TestBodyResponsePart: {
-            partName?: string;
-            subPartIds?: number[];
+        PageableObject: {
+            unpaged?: boolean;
+            /** Format: int32 */
+            pageNumber?: number;
+            paged?: boolean;
+            /** Format: int32 */
+            pageSize?: number;
+            /** Format: int64 */
+            offset?: number;
+            sort?: components["schemas"]["SortObject"];
+        };
+        SortObject: {
+            unsorted?: boolean;
+            sorted?: boolean;
+            empty?: boolean;
+        };
+        FunctionDto: {
+            /** Format: uuid */
+            id?: string;
+            name?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        PageFunctionDto: {
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["FunctionDto"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            first?: boolean;
+            last?: boolean;
+            empty?: boolean;
         };
     };
     responses: never;
@@ -145,6 +228,93 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getFunction: {
+        parameters: {
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageTariffDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+        };
+    };
+    createTariff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTariffRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TariffDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+        };
+    };
     signUp: {
         parameters: {
             query?: never;
@@ -229,9 +399,16 @@ export interface operations {
             };
         };
     };
-    test: {
+    getFunction_1: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -244,47 +421,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": {
-                        [key: string]: unknown;
-                    };
-                };
-            };
-            /** @description Bad Request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["BackendError"];
-                };
-            };
-            /** @description Unauthorized */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["BackendError"];
-                };
-            };
-        };
-    };
-    testWithBody: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["TestBodyResponse"];
+                    "application/json": components["schemas"]["PageFunctionDto"];
                 };
             };
             /** @description Bad Request */
@@ -324,6 +461,44 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["UserDto"];
                 };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+        };
+    };
+    deleteTariff: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tariffId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Bad Request */
             400: {
