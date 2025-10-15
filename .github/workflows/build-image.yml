@@ -37,7 +37,7 @@ jobs:
       matrix:
         service:
           - backend
-          - python-backend
+          - metrics-collector
           - frontend
           - postgres
           - liquibase
@@ -45,9 +45,9 @@ jobs:
           - service: backend
             context: ./java-backend
             dockerfile: ./java-backend/Dockerfile
-          - service: python-backend
-            context: ./python-backend
-            dockerfile: ./python-backend/Dockerfile
+          - service: metrics-collector
+            context: ./metrics-collector
+            dockerfile: ./metrics-collector/Dockerfile
           - service: frontend
             context: ./frontend
             dockerfile: ./frontend/Dockerfile
