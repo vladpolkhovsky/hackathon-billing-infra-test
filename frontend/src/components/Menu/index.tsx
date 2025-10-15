@@ -11,7 +11,9 @@ export default function SideMenu() {
   const isActive = (item: MenuItem) => (item.href ? location.pathname === item.href : false);
 
   return (
-    <aside className={`bg-white border-r border-gray-200 w-64 h-screen flex flex-col transition-width duration-200`}>
+    <aside
+      className={`bg-white border-r border-gray-200 w-64 h-[calc(100vh-48px)] flex flex-col transition-width duration-200`}
+    >
       <div className="flex items-center justify-between p-4">
         <div className="text-lg font-semibold">App</div>
       </div>
