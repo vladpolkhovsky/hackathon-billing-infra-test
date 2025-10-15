@@ -1,34 +1,33 @@
-import '@/App.css';
 import createClient from 'openapi-fetch';
 import { paths } from './api';
-import { useState } from 'react';
+import Layout from './layout';
+import { useUserStore } from './store';
+import { useEffect } from 'react';
+import { Route, Routes } from 'react-router';
 
 function App() {
-  const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<any>(null);
-  const [error, setError] = useState<any>(null);
   const client = createClient<paths>({
     baseUrl: '/api/billing',
   });
 
-  const testApi = async () => {
-    setLoading(true);
-    const { data, error } = await client.GET('/v1/test-with-body');
-    setData(data);
-    setError(error);
-    setLoading(false);
-  };
+  useEffect(() => {
+    client.GET('/v1/auth/iam').then((res) => {
+      setUser(res.data);
+    });
+  }, []);
+
+  const { setUser } = useUserStore();
 
   return (
-    <>
-      <h1>Billing API V2 rita</h1>
-      <h2>Curently only testing endpoint</h2>
-      <div className="card">
-        <button onClick={testApi}>{loading ? 'Loading...' : 'Test '}</button>
-        {error && <p>Error: {error.message}</p>}
-        {data && <p>Data: {JSON.stringify(data)}</p>}
-      </div>
-    </>
+    <Layout>
+      <Routes>
+        <Route path="/app/dashboard" element={<div>Dashboard</div>} />
+        <Route path="/app/projects/:id" element={<div>Project</div>} />
+        <Route path="/app/settings" element={<div>Settings</div>} />
+        <Route path="/app/signin" element={<div>Sign In</div>} />
+        <Route path="/app/signup" element={<div>Sign Up</div>} />
+      </Routes>
+    </Layout>
   );
 }
 
