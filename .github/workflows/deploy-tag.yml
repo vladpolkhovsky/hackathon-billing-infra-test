@@ -27,4 +27,4 @@ jobs:
             docker service update --image docker.vpolkhovsky.net/billing/frontend:${{ steps.get_tag_name.outputs.TAG_NAME }} billing-stack_frontend
             docker service update --image docker.vpolkhovsky.net/billing/liquibase:${{ steps.get_tag_name.outputs.TAG_NAME }} billing-stack_liquibase
             docker service update --image docker.vpolkhovsky.net/billing/postgres:${{ steps.get_tag_name.outputs.TAG_NAME }} billing-stack_postgres
-            docker service update --image docker.vpolkhovsky.net/billing/python-backend:${{ steps.get_tag_name.outputs.TAG_NAME }} billing-stack_python-backend
+            docker service update --image docker.vpolkhovsky.net/billing/metrics-collector:${{ steps.get_tag_name.outputs.TAG_NAME }} billing-stack_metrics-collector

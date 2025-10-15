@@ -95,7 +95,7 @@ services:
       - liquibase
 
   python-backend:
-    image: docker.vpolkhovsky.net/billing/python-backend:latest
+    image: docker.vpolkhovsky.net/billing/metrics-collector:latest
     env_file:
       - .env.prod
     ports:
