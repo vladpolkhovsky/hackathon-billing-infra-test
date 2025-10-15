@@ -6,4 +6,5 @@
     <!-- changelog/yyyy.MM.dd.hh-MM-changelog.xml   -->
     <include file="changelog/2025.10.12.21-00-changelog.xml" relativeToChangelogFile="true"/>
     <include file="changelog/2025.10.15.00-50-changelog.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/2025.10.15.19-20-changelog.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

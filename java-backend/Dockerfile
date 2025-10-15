@@ -1,19 +1,18 @@
-FROM amazoncorretto:21-alpine-jdk AS builder
+FROM gradle:9.1-jdk21-alpine AS builder
 
 WORKDIR /app
 
-COPY gradle ./gradle
-COPY gradlew gradlew
+COPY ./build.gradle.kts /app/
+COPY ./settings.gradle.kts /app/
 
-RUN chmod +x ./gradlew
+RUN gradle dependencies
 
-COPY build.gradle.kts settings.gradle.kts ./
+COPY ./src /app/src
 
-CMD ./gradlew dependencies
+RUN ls
+RUN tree
 
-COPY src /app/src
-
-RUN ["./gradlew", "build", "-x", "test"]
+RUN ["gradle", "build", "-x", "test"]
 
 RUN tree
 

@@ -1,6 +1,8 @@
+import os
 import aiohttp
 
-PROMETHEUS_URL = "http://localhost:9090/api/v1/query_range"
+PROMETHEUS_URL = os.getenv("PROMETHEUS_URL", default="http://localhost:52467");
+PROMETHEUS_URL_QUERY_RANGE = PROMETHEUS_URL + "/api/v1/query_range"
 
 def prepare_results(data):
     results = data.get("data", {}).get("result", [])
@@ -8,7 +10,7 @@ def prepare_results(data):
 
 async def prometheus_request(params):
     async with aiohttp.ClientSession() as session:
-        async with session.get(PROMETHEUS_URL, params=params) as response:
+        async with session.get(PROMETHEUS_URL_QUERY_RANGE, params=params) as response:
             if response.status != 200:
                 raise Exception(f"Ошибка запроса к Prometheus: {response}")
             data = await response.json()

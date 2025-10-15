@@ -12,6 +12,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldNameConstants;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -19,6 +20,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @MappedSuperclass
 @NoArgsConstructor
 @AllArgsConstructor
+@FieldNameConstants
 public class BaseEntity<ID extends Serializable> implements Serializable {
 
     @Id

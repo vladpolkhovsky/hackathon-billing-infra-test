@@ -1,13 +1,14 @@
 from datetime import datetime
+import os
 
 import asyncpg
 
 DB_CONFIG = {
-    "user": "postgres",
-    "password": "postgres",
-    "database": "billing",
-    "host": "localhost",
-    "port": 6000
+    "user": os.getenv("DB_USER", default="postgres"),
+    "password": os.getenv("DB_PASSWORD", default="postgres"),
+    "database": os.getenv("DB_DATABASE", default="billing"),
+    "host": os.getenv("DB_HOST", default="localhost"),
+    "port": os.getenv("DB_PORT", default=6000)
 }
 
 async def get_functions():

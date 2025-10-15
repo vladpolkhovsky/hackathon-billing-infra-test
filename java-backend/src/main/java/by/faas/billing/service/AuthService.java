@@ -1,6 +1,5 @@
 package by.faas.billing.service;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 import by.faas.billing.config.security.JwtRelatedThings;
 import by.faas.billing.config.security.Role;
