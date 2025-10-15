@@ -94,7 +94,7 @@ services:
     depends_on:
       - liquibase
 
-  python-backend:
+  metrics-collector:
     image: docker.vpolkhovsky.net/billing/metrics-collector:latest
     env_file:
       - .env.prod
