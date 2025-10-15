@@ -1,10 +1,10 @@
 import { paths } from '@/api';
+import createClient from 'openapi-fetch';
 import useTariffStore from '@/store/tariff';
 import { Button } from '@headlessui/react';
-import createClient from 'openapi-fetch';
 import { useEffect } from 'react';
 
-const Tariffs = () => {
+const TariffsRoute = () => {
   const { tariffs, setTariffs, setTariffError } = useTariffStore();
   const client = createClient<paths>({
     baseUrl: '/api/billing',
@@ -45,4 +45,4 @@ const Tariffs = () => {
   );
 };
 
-export default Tariffs;
+export default TariffsRoute;

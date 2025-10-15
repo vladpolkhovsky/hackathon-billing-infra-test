@@ -4,7 +4,8 @@ import Layout from './layout';
 import { useUserStore } from './store';
 import { useEffect } from 'react';
 import { Route, Routes } from 'react-router';
-import Tariffs from './routes/tariffs';
+import TariffsRoute from './routes/tariffs';
+import FunctionRoute from './routes/function';
 
 function App() {
   const client = createClient<paths>({
@@ -22,8 +23,10 @@ function App() {
   return (
     <Layout>
       <Routes>
-        <Route path="/app/tariffs" element={<Tariffs />} />
+        <Route path="/app/tariffs" element={<TariffsRoute />} />
         <Route path="/app/functions" element={<div>Functions</div>} />
+        <Route path="/app/tariffs/:tariffId" element={<div />} />
+        <Route path="/app/functions/:functionId" element={<FunctionRoute />} />
       </Routes>
     </Layout>
   );
