@@ -36,6 +36,13 @@ public class AuthController {
         return authService.signIn(body.getUsername(), body.getPassword());
     }
 
+    @PostMapping(value = "/logout")
+    @Operation(summary = "Логаут")
+    public ResponseEntity<Void> signIn(@AuthenticationPrincipal UserDto user) throws AccessDeniedException {
+        log.info("logout user {}", user);
+        return authService.logout();
+    }
+
     @PostMapping(value = "/sign-up", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @HasManagerAuthority
     @Operation(summary = "Создание учётной записи")

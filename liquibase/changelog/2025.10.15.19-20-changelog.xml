@@ -81,6 +81,7 @@
     <changeSet id="1760552995701-1" author="vpolkhovsky">
         <insert tableName="functions" schemaName="billing">
             <column name="name" value="echo"/>
+            <column name="id" value="0199e9ab-2ccb-7aa7-85d4-b4ed595b586e"/>
         </insert>
         <insert tableName="functions" schemaName="billing">
             <column name="name" value="test_function"/>

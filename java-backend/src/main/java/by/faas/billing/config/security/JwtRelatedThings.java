@@ -44,10 +44,26 @@ public class JwtRelatedThings {
         );
     }
 
+    public HttpHeaders createLogoutHeaders() {
+        return HttpHeaders.readOnlyHttpHeaders(MultiValueMap
+            .fromSingleValue(Map.of(HttpHeaders.SET_COOKIE, toResetCookie()))
+        );
+    }
+
     private String toCookie(String token) {
         ResponseCookie cookie = ResponseCookie.from(jwtProperties.getJwtCookieName(), token)
             .httpOnly(true)
             .maxAge(Duration.ofDays(365))
+            .sameSite("Lax")
+            .path("/")
+            .build();
+        return cookie.toString();
+    }
+
+    private String toResetCookie() {
+        ResponseCookie cookie = ResponseCookie.from(jwtProperties.getJwtCookieName(), "")
+            .httpOnly(true)
+            .maxAge(0)
             .sameSite("Lax")
             .path("/")
             .build();

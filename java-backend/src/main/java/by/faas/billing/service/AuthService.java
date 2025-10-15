@@ -86,4 +86,10 @@ public class AuthService {
 
         return ResponseEntity.ok(userMapper.toDto(saved));
     }
+
+    public ResponseEntity<Void> logout() {
+        return ResponseEntity.ok()
+            .headers(jwtRelatedThings.createLogoutHeaders())
+            .build();
+    }
 }

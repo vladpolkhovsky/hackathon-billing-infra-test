@@ -31,6 +31,7 @@ public class MetricEntity extends BaseEntity<UUID> {
 
     public enum MetricType {
         memory_usage,
-        cpu_usage
+        cpu_usage,
+        request_count
     }
 }
