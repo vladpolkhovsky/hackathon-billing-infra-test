@@ -14,9 +14,11 @@
     "lint": "eslint --quiet --cache --report-unused-disable-directives src/**/*.{ts,tsx,js,jsx}",
     "lint:fix": "eslint --fix --quiet --cache --report-unused-disable-directives src/**/*.{ts,tsx,js,jsx}",
     "format": "prettier --write --ignore-unknown .",
-    "schema": "openapi-typescript http://localhost/api/billing/v3/api-docs --output src/api.ts"
+    "schema": "openapi-typescript http://localhost:8080/api/billing/v3/api-docs --output src/api.ts"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.9",
+    "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.1.14",
     "chartjs": "^0.3.24",
     "headlessui": "^0.0.0",
