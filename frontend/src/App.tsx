@@ -4,6 +4,7 @@ import Layout from './layout';
 import { useUserStore } from './store';
 import { useEffect } from 'react';
 import { Route, Routes } from 'react-router';
+import Tariffs from './routes/tariffs';
 
 function App() {
   const client = createClient<paths>({
@@ -12,7 +13,7 @@ function App() {
 
   useEffect(() => {
     client.GET('/v1/auth/iam').then((res) => {
-      setUser(res.data);
+      setUser(res.data || null);
     });
   }, []);
 
@@ -21,11 +22,8 @@ function App() {
   return (
     <Layout>
       <Routes>
-        <Route path="/app/dashboard" element={<div>Dashboard</div>} />
-        <Route path="/app/projects/:id" element={<div>Project</div>} />
-        <Route path="/app/settings" element={<div>Settings</div>} />
-        <Route path="/app/signin" element={<div>Sign In</div>} />
-        <Route path="/app/signup" element={<div>Sign Up</div>} />
+        <Route path="/app/tariffs" element={<Tariffs />} />
+        <Route path="/app/functions" element={<div>Functions</div>} />
       </Routes>
     </Layout>
   );
