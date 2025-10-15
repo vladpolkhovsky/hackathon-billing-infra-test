@@ -2,13 +2,15 @@ import { paths } from '@/api';
 import createClient from 'openapi-fetch';
 import useTariffStore from '@/store/tariff';
 import { Button } from '@headlessui/react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import AddTariffModal from './components/AddTariffModal';
 
 const TariffsRoute = () => {
   const { tariffs, setTariffs, setTariffError } = useTariffStore();
   const client = createClient<paths>({
     baseUrl: '/api/billing',
   });
+  const [isOpenedAddTariffModal, setIsOpenedAddTariffModal] = useState(false);
 
   useEffect(() => {
     const getTariffs = async () => {
@@ -23,9 +25,15 @@ const TariffsRoute = () => {
 
   return (
     <div className="w-full pr-4">
+      {isOpenedAddTariffModal && <AddTariffModal onClose={() => setIsOpenedAddTariffModal(false)} />}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold my-4">Tariffs</h1>
-        <Button className="bg-blue-300 hover:bg-blue-400 px-4 py-2 rounded">Add tariff</Button>
+        <Button
+          className="bg-blue-300 hover:bg-blue-400 px-4 py-2 rounded"
+          onClick={() => setIsOpenedAddTariffModal(true)}
+        >
+          Add tariff
+        </Button>
       </div>
       {tariffs.map((tariff) => (
         <div key={tariff.id} className="flex gap-4 py-4 mr-4 border-b last:border-b-0 border-gray-300 w-full">
