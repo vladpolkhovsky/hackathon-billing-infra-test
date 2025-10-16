@@ -2,7 +2,7 @@ import { Tab, TabGroup } from '@headlessui/react';
 import { useState } from 'react';
 import Details from './components/Details';
 import Graphs from './components/Graphs';
-import { BillingFunction, BillingFunctionDetails } from "@/types";
+import { BillingFunction, BillingFunctionDetails } from '@/types';
 
 interface FunctionRouteProps {
   activeFunction: BillingFunction;

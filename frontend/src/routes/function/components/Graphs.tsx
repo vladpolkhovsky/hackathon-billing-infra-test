@@ -1,4 +1,4 @@
-import { BillingFunction, BillingFunctionDetails } from "@/types";
+import { BillingFunction, BillingFunctionDetails } from '@/types';
 import { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 
@@ -18,37 +18,39 @@ const Graphs = ({ activeFunction, functionInfo }: FunctionProps) => {
 
     const steps = functionInfo.steps;
     const labels = Object.keys(steps).sort();
-    
-    const cpuData = labels.map(label => steps[label].totalCpuAmount);
-    const memoryData = labels.map(label => steps[label].totalMemoryAmount);
-    const priceData = labels.map(label => steps[label].totalPrice);
-    const callsData = labels.map(label => steps[label].totalCallCount);
+
+    const cpuData = labels.map((label) => steps[label].totalCpuAmount);
+    const memoryData = labels.map((label) => steps[label].totalMemoryAmount);
+    const priceData = labels.map((label) => steps[label].totalPrice);
+    const callsData = labels.map((label) => steps[label].totalCallCount);
 
     const charts: Chart[] = [];
-    
+
     //CPU
     if (cpuChartRef.current) {
       const cpuChart = new Chart(cpuChartRef.current, {
         type: 'line',
         data: {
           labels: labels,
-          datasets: [{
-            label: 'CPU Usage',
-            data: cpuData,
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            tension: 0.1
-          }]
+          datasets: [
+            {
+              label: 'CPU Usage',
+              data: cpuData,
+              borderColor: 'rgb(255, 99, 132)',
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              tension: 0.1,
+            },
+          ],
         },
         options: {
           responsive: true,
           plugins: {
             title: {
               display: true,
-              text: 'CPU Usage Over Time'
-            }
-          }
-        }
+              text: 'CPU Usage Over Time',
+            },
+          },
+        },
       });
       charts.push(cpuChart);
     }
@@ -59,23 +61,26 @@ const Graphs = ({ activeFunction, functionInfo }: FunctionProps) => {
         type: 'line',
         data: {
           labels: labels,
-          datasets: [{
-            label: 'Memory Usage',
-            data: memoryData,
-            borderColor: 'rgb(54, 162, 235)',
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            tension: 0.1
-          }]
+          datasets: [
+            {
+              label:
+                'Memory Usage',
+              data: memoryData,
+              borderColor: 'rgb(54, 162, 235)',
+              backgroundColor: 'rgba(54, 162, 235, 0.2)',
+              tension: 0.1,
+            },
+          ],
         },
         options: {
           responsive: true,
           plugins: {
             title: {
               display: true,
-              text: 'Memory Usage Over Time'
-            }
-          }
-        }
+              text: 'Memory Usage Over Time',
+            },
+          },
+        },
       });
       charts.push(memoryChart);
     }
@@ -86,26 +91,27 @@ const Graphs = ({ activeFunction, functionInfo }: FunctionProps) => {
         type: 'line',
         data: {
           labels: labels,
-          datasets: [{
-            label: 'Total Price',
-            data: priceData,
-            borderColor: 'rgb(75, 192, 192)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            tension: 0.1
-          }]
+          datasets: [
+            {
+              label: 'Total Price',
+              data: priceData,
+              borderColor: 'rgb(75, 192, 192)',
+              tension: 0.1,
+            },
+          ],
         },
         options: {
           responsive: true,
           plugins: {
-            title: {
-              display: true,
-              text: 'Cost Over Time'
-            }
-          }
-        }
-      });
+            display: true,
+            text: 'Cost Over Time',
+          },
+        },
+      },
+      )
       charts.push(priceChart);
-    }
+    };
+
 
     //Calls
     if (callsChartRef.current) {
@@ -113,29 +119,30 @@ const Graphs = ({ activeFunction, functionInfo }: FunctionProps) => {
         type: 'bar',
         data: {
           labels: labels,
-          datasets: [{
-            label: 'Function Calls',
-            data: callsData,
-            backgroundColor: 'rgba(153, 102, 255, 0.6)',
-            borderColor: 'rgb(153, 102, 255)',
-            borderWidth: 1
-          }]
+          datasets: [
+            {
+              label: 'Function Calls',
+              data: callsData,
+              backgroundColor: 'rgba(153, 102, 255, 0.6)',
+              borderColor: 'rgb(153, 102, 255)',
+              borderWidth: 1,
+            }],
         },
         options: {
           responsive: true,
           plugins: {
             title: {
+
               display: true,
-              text: 'Function Calls Over Time'
-            }
-          }
-        }
+            },
+          },
+        },
       });
       charts.push(callsChart);
     }
 
     return () => {
-      charts.forEach(chart => chart.destroy());
+      charts.forEach((chart) => chart.destroy());
     };
   }, [functionInfo]);
 
