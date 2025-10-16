@@ -5,7 +5,7 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import createClient from 'openapi-fetch';
 import { useEffect, useState } from 'react';
 
-const AuthModal = ({ onClose }: { onClose: () => void }) => {
+const AuthModal = ({ onClose }: { onClose?: () => void }) => {
   const client = createClient<paths>({
     baseUrl: '/api/billing',
   });
@@ -28,7 +28,7 @@ const AuthModal = ({ onClose }: { onClose: () => void }) => {
       setError(error.message || 'Something went wrong');
     } else {
       setUser(data);
-      onClose();
+      onClose?.();
     }
   };
 

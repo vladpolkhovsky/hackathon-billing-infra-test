@@ -1,9 +1,20 @@
 import { useState } from 'react';
 import { MenuItem, menu } from './config';
 import { Link, useLocation } from 'react-router';
+import createClient from 'openapi-fetch';
+import { paths } from '@/api';
 
 export default function SideMenu() {
   const [openIds, setOpenIds] = useState<Record<string, boolean>>({});
+  const client = createClient<paths>({
+    baseUrl: '/api/billing',
+  });
+
+  const logout = () => {
+    client.POST('/v1/auth/logout').then(() => {
+      window.location.href = '/';
+    });
+  };
 
   const toggle = (id: string) => setOpenIds((s) => ({ ...s, [id]: !s[id] }));
 
@@ -74,7 +85,9 @@ export default function SideMenu() {
       </nav>
 
       <div className="px-4 py-3 border-t border-gray-200 ">
-        <button className="w-full text-sm px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200">Logout</button>
+        <button className="w-full text-sm px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200" onClick={logout}>
+          Logout
+        </button>
       </div>
     </aside>
   );
