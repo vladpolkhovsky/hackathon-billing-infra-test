@@ -3,6 +3,8 @@ import os
 
 import asyncpg
 
+from app.services.requests import prometheus_request
+
 DB_CONFIG = {
     "user": os.getenv("DB_USER", default="postgres"),
     "password": os.getenv("DB_PASSWORD", default="postgres"),
@@ -10,6 +12,26 @@ DB_CONFIG = {
     "host": os.getenv("DB_HOST", default="localhost"),
     "port": os.getenv("DB_PORT", default=6000)
 }
+
+async def append_new_functions():
+    query = "autoscaler_actual_pods"
+    data = await prometheus_request({"query": query}, request_type="query")
+    funcs = [[item["metric"].get("service_name")] for item in data["data"]["result"]]
+
+    conn = await asyncpg.connect(**DB_CONFIG)
+    try:
+        await conn.executemany(
+            """
+            INSERT INTO billing.functions (name)
+            VALUES ($1)
+            ON CONFLICT (name) DO NOTHING
+            """,
+            funcs
+        )
+    finally:
+        await conn.close()
+
+
 
 async def get_functions():
     conn = await asyncpg.connect(**DB_CONFIG)
