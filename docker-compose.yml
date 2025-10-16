@@ -46,7 +46,7 @@ services:
       liquibase:
         condition: service_completed_successfully
 
-  python-backend:
+  metrics-collector:
     build:
       context: ./metrics-collector
       dockerfile: Dockerfile
@@ -58,7 +58,7 @@ services:
       DB_DATABASE: billing
       DB_USER: postgres
       DB_PASSWORD: postgres
-      PROMETHEUS_URL: http://localhost:9090
+      PROMETHEUS_URL: http://host.docker.internal:9090
     ports:
       - "8081:8081"
     healthcheck:

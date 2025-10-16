@@ -21,11 +21,21 @@ const FunctionsRoute = () => {
 
   useEffect(() => {
     if (activeFunction && activeFunction.id) {
-      client.GET('/v1/details', {
-        params: { query: { functionId: activeFunction.id, tariffId: '0199ea25-117f-76d2-b3a8-a4a22958e3f1', period: 'HOUR', from: 0, to: 2760574471014 } },
-      }).then((res) => {
-        setFunctionInfo(res.data as BillingFunctionDetails || null); 
-      });
+      client
+        .GET('/v1/details', {
+          params: {
+            query: {
+              functionId: activeFunction.id,
+              tariffId: '0199ea25-117f-76d2-b3a8-a4a22958e3f1',
+              period: 'MINUTE',
+              from: 1760504471014,
+              to: 1760574471014,
+            },
+          },
+        })
+        .then((res) => {
+          setFunctionInfo((res.data as BillingFunctionDetails) || null);
+        });
     }
   }, [activeFunction]);
 
