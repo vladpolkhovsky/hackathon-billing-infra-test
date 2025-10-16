@@ -9,4 +9,8 @@
     <include file="changelog/2025.10.15.19-20-changelog.xml" relativeToChangelogFile="true"/>
     <include file="changelog/2025.10.15.22-30-changelog.sql" relativeToChangelogFile="true"/>
     <include file="changelog/metrics_202510160202.sql" relativeToChangelogFile="true"/>
+    <include file="changelog/mocked-functions-metrics.sql" relativeToChangelogFile="true"/>
+    <include file="changelog/mocked-metrics.sql" relativeToChangelogFile="true"/>
+    <include file="changelog/mocked-metrics-2.sql" relativeToChangelogFile="true"/>
+    <include file="changelog/mocked-metrics-3.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

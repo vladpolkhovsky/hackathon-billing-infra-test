@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import by.faas.billing.dto.BillingDto;
 import by.faas.billing.dto.BillingPeriod;
+import by.faas.billing.dto.BillingRecord;
 import by.faas.billing.dto.BillingRegistryDto;
 import by.faas.billing.dto.FunctionDto;
 import by.faas.billing.dto.TariffDto;
@@ -61,6 +62,16 @@ public class BillingService {
             .sorted()
             .toList();
 
+        Map<LocalDateTime, BillingDto.BillingRecordStepDto> stepsRecords = calcMetricsSteps(steps, byTime, period, tariff);
+        BigDecimal callCount = stepsRecords.values().stream().map(BillingRecord::getTotalCallCount)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal callPrice = stepsRecords.values().stream().map(BillingRecord::getTotalCallPrice)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal memoryPrice = stepsRecords.values().stream().map(BillingRecord::getTotalMemoryPrice)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal cpuPrice = stepsRecords.values().stream().map(BillingRecord::getTotalCpuPrice)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         return BillingDto.builder()
             .tariff(tariffMapper.map(tariff))
             .function(functionMapper.map(function))
@@ -68,14 +79,14 @@ public class BillingService {
             .billingTo(to)
             .stepPeriod(period)
             .stepsCount((long) steps.size())
-            .totalPrice(result.totalPrice())
+            .totalPrice(cpuPrice.add(callPrice).add(memoryPrice))
             .totalMemoryAmount(result.totalMemoryAmount())
-            .totalMemoryPrice(result.totalMemoryAmountPrice())
+            .totalMemoryPrice(memoryPrice)
             .totalCpuAmount(result.totalCpuAmount())
-            .totalCpuPrice(result.totalCpuAmountPrice())
-            .totalCallCount(result.totalRequestAmount())
-            .totalCallPrice(result.totalRequestAmountPrice())
-            .steps(calcMetricsSteps(steps, byTime, period, tariff))
+            .totalCpuPrice(cpuPrice)
+            .totalCallCount(callCount)
+            .totalCallPrice(callPrice)
+            .steps(stepsRecords)
             .metricsRecordsCount((long) resourceConsumption.size())
             .build();
     }
@@ -95,10 +106,10 @@ public class BillingService {
         Map<UUID, List<ResourceConsumptionProjection>> byFunctionId = resourceConsumption.stream()
             .collect(Collectors.groupingBy(ResourceConsumptionProjection::getFunctionId));
 
-        return functions.map(function -> calcRegistryBillingDto(function, byFunctionId.getOrDefault(function.getId(), List.of()), tariff));
+        return functions.map(function -> calcRegistryBillingDto(byFunctionId.getOrDefault(function.getId(), List.of()), tariff));
     }
 
-    private BillingRegistryDto calcRegistryBillingDto(FunctionEntity function, List<ResourceConsumptionProjection> consumption, TariffEntity tariff) {
+    private BillingRegistryDto calcRegistryBillingDto(List<ResourceConsumptionProjection> consumption, TariffEntity tariff) {
         Map<MetricEntity.MetricType, List<ResourceConsumptionProjection>> byMetricType = consumption.stream()
             .collect(Collectors.groupingBy(ResourceConsumptionProjection::getType));
 
@@ -106,12 +117,15 @@ public class BillingService {
             : consumption.getFirst().getTime();
 
         CalculationResult calculationResult = calculateConsumption(byMetricType, tariff, BillingPeriod.MONTH);
+        Long metricsCount = consumption.stream()
+            .map(ResourceConsumptionProjection::getHitsCount)
+            .reduce(0L, Long::sum);
 
         return BillingRegistryDto.builder()
             .tariff(tariffMapper.map(tariff))
             .billingPeriod(BillingPeriod.MONTH)
             .billingFrom(billingFromTime)
-            .metricsRecordsCount((long) consumption.size())
+            .metricsRecordsCount(metricsCount)
             .totalPrice(calculationResult.totalPrice())
             .totalMemoryAmount(calculationResult.totalMemoryAmount())
             .totalMemoryPrice(calculationResult.totalMemoryAmountPrice())
@@ -133,6 +147,10 @@ public class BillingService {
 
         CalculationResult result = calculateConsumption(byType, tariff, period);
 
+        Long metricsCount = stepConsumption.stream()
+            .map(ResourceConsumptionProjection::getHitsCount)
+            .reduce(0L, Long::sum);
+
         return BillingDto.BillingRecordStepDto.builder()
             .stepTime(stepTime)
             .stepPeriod(period)
@@ -143,26 +161,32 @@ public class BillingService {
             .totalCpuPrice(result.totalCpuAmountPrice())
             .totalCallCount(result.totalRequestAmount())
             .totalCallPrice(result.totalRequestAmountPrice())
-            .metricsRecordsCount((long) stepConsumption.size())
+            .metricsRecordsCount(metricsCount)
             .build();
     }
 
     private static CalculationResult calculateConsumption(Map<MetricEntity.MetricType, List<ResourceConsumptionProjection>> byMetricType, TariffEntity tariff, BillingPeriod period) {
-        BigDecimal totalMemoryAmount = byMetricType.getOrDefault(MetricEntity.MetricType.memory_usage, List.of()).stream()
+        List<ResourceConsumptionProjection> memoryConsumptionRecords = byMetricType.getOrDefault(MetricEntity.MetricType.memory_usage, List.of());
+        List<ResourceConsumptionProjection> cpuConsumptionRecords = byMetricType.getOrDefault(MetricEntity.MetricType.cpu_usage, List.of());
+
+        BigDecimal totalMemoryAmount = memoryConsumptionRecords.stream()
             .map(ResourceConsumptionProjection::getAverage)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+            .reduce(BigDecimal.ZERO, BigDecimal::add)
+            .divide(BigDecimal.valueOf(memoryConsumptionRecords.isEmpty() ? 1 : memoryConsumptionRecords.size()), RoundingMode.CEILING);
         BigDecimal totalMemoryAmountPrice = totalMemoryAmount.multiply(BigDecimal.valueOf(tariff.getMemoryPrice()))
             .divide(getMemoryGbHourDivider(period), RoundingMode.CEILING);
 
-        BigDecimal totalCpuAmount = byMetricType.getOrDefault(MetricEntity.MetricType.cpu_usage, List.of()).stream()
+        BigDecimal totalCpuAmount = cpuConsumptionRecords.stream()
             .map(ResourceConsumptionProjection::getAverage)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal totalCpuAmountPrice = totalCpuAmount.multiply(BigDecimal.valueOf(tariff.getCpuPrice()))
-            .divide(getCpuDivider(period), RoundingMode.CEILING);
+            .divide(getCpuDivider(period), RoundingMode.CEILING)
+            .divide(BigDecimal.valueOf(cpuConsumptionRecords.isEmpty() ? 1 : cpuConsumptionRecords.size()), RoundingMode.CEILING);
 
         BigDecimal totalRequestAmount = byMetricType.getOrDefault(MetricEntity.MetricType.request_count, List.of()).stream()
-            .map(ResourceConsumptionProjection::getAverage)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+            .map(ResourceConsumptionProjection::getMax)
+            .reduce(BigDecimal.ZERO, BigDecimal::add)
+            .divide(BigDecimal.valueOf(memoryConsumptionRecords.isEmpty() ? 1 : memoryConsumptionRecords.size()), RoundingMode.CEILING);
         BigDecimal totalRequestAmountPrice = totalRequestAmount.multiply(BigDecimal.valueOf(tariff.getCallPrice()));
 
         return new CalculationResult(totalMemoryAmount, totalMemoryAmountPrice, totalCpuAmount, totalCpuAmountPrice, totalRequestAmount, totalRequestAmountPrice);
@@ -193,7 +217,7 @@ public class BillingService {
     }
 
     private static BigDecimal getCpuDivider(BillingPeriod period) {
-        BigDecimal divider = BigDecimal.valueOf(1000);
+        BigDecimal divider = BigDecimal.ONE;
         switch (period) {
             case MINUTE -> {
                 return divider.multiply(BigDecimal.valueOf(60));
