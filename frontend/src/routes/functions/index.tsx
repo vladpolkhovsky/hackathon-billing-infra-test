@@ -42,7 +42,7 @@ const FunctionsRoute = () => {
               tariffId: activeTariff.id,
               period: 'MINUTE',
               from: Date.now() - 1000 * 60 * 60 * 24 * 15,
-              to: Date.now(),
+              to: Date.now() + 1000 * 60 * 60 * 24 * 5,
             },
           },
         })
