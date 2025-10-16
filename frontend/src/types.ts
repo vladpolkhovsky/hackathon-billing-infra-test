@@ -20,3 +20,41 @@ export interface Tariff {
   updatedAt?: string;
   createdBy?: User;
 }
+
+export interface BillingFunction {
+  id?: string;
+  name?: string;
+  updatedAt?: string;
+  createdAt?: string;
+}
+
+export interface BillingFunctionDetails {
+  billingFrom: string;
+  billingTo: string;
+  function: BillingFunction;
+  metricsRecordsCount: number;
+  stepPeriod: string;
+  steps: {
+    [key: string]: {
+      metricsRecordsCount: number;
+      stepPeriod: string;
+      stepTime: string;
+      totalCallCount: number;
+      totalCallPrice: number;
+      totalCpuAmount: number;
+      totalCpuPrice: number;
+      totalMemoryAmount: number;
+      totalMemoryPrice: number;
+      totalPrice: number;
+    };
+  };
+  stepsCount: number;
+  tariff: Tariff;
+  totalCallCount: number;
+  totalCallPrice: number;
+  totalCpuAmount: number;
+  totalCpuPrice: number;
+  totalMemoryAmount: number;
+  totalMemoryPrice: number;
+  totalPrice: number;
+}
