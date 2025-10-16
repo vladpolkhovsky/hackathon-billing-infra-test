@@ -1,8 +1,11 @@
-import { Tab, TabGroup } from '@headlessui/react';
-import { useState } from 'react';
+import { Select, Tab, TabGroup } from '@headlessui/react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import Details from './components/Details';
 import Graphs from './components/Graphs';
 import { BillingFunction, BillingFunctionDetails } from '@/types';
+import createClient from 'openapi-fetch';
+import { paths } from '@/api';
+import useTariffStore from '@/store/tariff';
 
 interface FunctionRouteProps {
   activeFunction: BillingFunction;
@@ -12,6 +15,25 @@ interface FunctionRouteProps {
 
 const FunctionRoute = ({ activeFunction, setActiveFunction, functionInfo }: FunctionRouteProps) => {
   const [activeTab, setActiveTab] = useState<'details' | 'graphs'>('details');
+  const { tariffs, activeTariff, setTariffs, setActiveTariff } = useTariffStore();
+  const client = createClient<paths>({
+    baseUrl: '/api/billing',
+  });
+
+  useEffect(() => {
+    if (!tariffs.length) {
+      client.GET('/v1/tariff').then((res) => {
+        setTariffs(res.data?.content || []);
+        setActiveTariff(res.data?.content?.[0] || null);
+      });
+    }
+  }, [tariffs]);
+
+  const handleTariffChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    console.log(value);
+    setActiveTariff(tariffs.find((t: any) => t.id === value) || null);
+  };
   return (
     <div className="w-full pr-4">
       <div className="flex justify-between items-center">
@@ -31,6 +53,17 @@ const FunctionRoute = ({ activeFunction, setActiveFunction, functionInfo }: Func
             Graphs
           </Tab>
         </TabGroup>
+        <Select
+          value={activeTariff?.id}
+          onChange={handleTariffChange}
+          className="w-64 bg-gray-100 hover:bg-gray-300 px-4 py-2 rounded"
+        >
+          {tariffs.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.name}
+            </option>
+          ))}
+        </Select>
       </div>
       {activeTab === 'details' && <Details activeFunction={activeFunction} functionInfo={functionInfo} />}
       {activeTab === 'graphs' && <Graphs activeFunction={activeFunction} functionInfo={functionInfo} />}
