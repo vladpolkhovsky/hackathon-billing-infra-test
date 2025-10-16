@@ -13,6 +13,8 @@ public interface ResourceConsumptionProjection {
     MetricEntity.MetricType getType();
     @Value("#{target.timePeriod}")
     LocalDateTime getTime();
+    @Value("#{target.measurementCount}")
+    Long getHitsCount();
     @Value("#{target.avgValue}")
     BigDecimal getAverage();
     @Value("#{target.minValue}")

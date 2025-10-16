@@ -7,6 +7,7 @@ export interface TariffState {
   activeTariff: Tariff | null;
   setTariffs: (tariffs: Tariff[]) => void;
   setTariffError: (error: string) => void;
+  setActiveTariff: (tariff: Tariff | null) => void;
   reset: () => void;
 }
 
@@ -16,6 +17,7 @@ const useTariffStore = create<TariffState>()((set) => ({
   activeTariff: null,
   setTariffs: (tariffs) => set({ tariffs }),
   setTariffError: (error) => set({ error }),
+  setActiveTariff: (tariff) => set({ activeTariff: tariff }),
   reset: () => set({ tariffs: [] }),
 }));
 

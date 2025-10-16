@@ -57,9 +57,10 @@
     <changeSet id="1760551172585-1>" author="vpolkhovsky">
         <insert tableName="tariffs" schemaName="billing">
             <column name="tariff_name" value="Тариф 1"/>
-            <column name="call_price" value="0.1"/>
-            <column name="memory_price" value="0.0004"/>
-            <column name="cpu_price" value="0.0003"/>
+            <column name="id" value="0199ea25-117f-76d2-b3a8-a4a22958e3f1"/>
+            <column name="call_price" value="0.01"/>
+            <column name="memory_price" value="0.04"/>
+            <column name="cpu_price" value="0.03"/>
             <column name="created_by" value="ec283d45-467b-4de2-a433-867943ffb842"/>
         </insert>
         <insert tableName="tariffs" schemaName="billing">

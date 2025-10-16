@@ -1,13 +1,17 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import createClient from 'openapi-fetch';
 import { paths } from '../../api';
 import { BillingFunction, BillingFunctionDetails } from '@/types';
 import FunctionRoute from '../function';
+import useTariffStore from '@/store/tariff';
+import { Select } from '@headlessui/react';
 
 const FunctionsRoute = () => {
   const [functions, setFunctions] = useState<BillingFunction[]>([]);
   const [activeFunction, setActiveFunction] = useState<BillingFunction | null>(null);
   const [functionInfo, setFunctionInfo] = useState<BillingFunctionDetails | null>(null);
+
+  const { tariffs, activeTariff, setTariffs, setActiveTariff } = useTariffStore();
 
   const client = createClient<paths>({
     baseUrl: '/api/billing',
@@ -20,16 +24,25 @@ const FunctionsRoute = () => {
   }, []);
 
   useEffect(() => {
-    if (activeFunction && activeFunction.id) {
+    if (!tariffs.length) {
+      client.GET('/v1/tariff').then((res) => {
+        setTariffs(res.data?.content || []);
+        setActiveTariff(res.data?.content?.[0] || null);
+      });
+    }
+  }, [tariffs]);
+
+  useEffect(() => {
+    if (activeFunction && activeFunction.id && activeTariff && activeTariff.id) {
       client
         .GET('/v1/details', {
           params: {
             query: {
               functionId: activeFunction.id,
-              tariffId: '0199ea25-117f-76d2-b3a8-a4a22958e3f1',
-              period: 'MINUTE',
-              from: 1760504471014,
-              to: 1760574471014,
+              tariffId: activeTariff.id,
+              period: 'HOUR',
+              from: Date.now() - 1000 * 60 * 60 * 24 * 15,
+              to: Date.now() + 1000 * 60 * 60 * 24 * 5,
             },
           },
         })
@@ -37,14 +50,33 @@ const FunctionsRoute = () => {
           setFunctionInfo((res.data as BillingFunctionDetails) || null);
         });
     }
-  }, [activeFunction]);
+  }, [activeFunction, activeTariff]);
+
+  const handleTariffChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    console.log(value);
+    setActiveTariff(tariffs.find((t) => t.id === value) || null);
+  };
 
   return (
     <div className="w-full pr-4">
       <div className="items-center">
         {!activeFunction && (
           <>
-            <h1 className="text-3xl font-bold my-4">Functions</h1>
+            <div className="flex justify-between items-center">
+              <h1 className="text-3xl font-bold my-4">Functions</h1>
+              <Select
+                value={activeTariff?.id}
+                onChange={handleTariffChange}
+                className="w-64 bg-gray-100 hover:bg-gray-300 px-4 py-2 rounded"
+              >
+                {tariffs.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
+                ))}
+              </Select>
+            </div>
             <div className="flex gap-2">
               {functions.map((f) => (
                 <button

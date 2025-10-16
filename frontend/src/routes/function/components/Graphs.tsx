@@ -1,6 +1,7 @@
 import { BillingFunction, BillingFunctionDetails } from '@/types';
 import { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
+import { format } from 'date-fns';
 
 interface FunctionProps {
   activeFunction: BillingFunction;
@@ -16,7 +17,9 @@ const Graphs = ({ activeFunction, functionInfo }: FunctionProps) => {
   useEffect(() => {
     if (!functionInfo?.steps) return;
 
-    const steps = functionInfo.steps;
+    const steps = Object.fromEntries(
+      Object.entries(functionInfo.steps).map(([key, value]) => [format(key, 'yyyy-MM-dd HH:mm:ss'), value]),
+    );
     const labels = Object.keys(steps).sort();
 
     const cpuData = labels.map((label) => steps[label].totalCpuAmount);
@@ -38,6 +41,7 @@ const Graphs = ({ activeFunction, functionInfo }: FunctionProps) => {
               data: cpuData,
               borderColor: 'rgb(255, 99, 132)',
               backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              pointBorderWidth: 0,
               tension: 0.1,
             },
           ],
@@ -63,12 +67,12 @@ const Graphs = ({ activeFunction, functionInfo }: FunctionProps) => {
           labels: labels,
           datasets: [
             {
-              label:
-                'Memory Usage',
+              label: 'Memory Usage',
               data: memoryData,
               borderColor: 'rgb(54, 162, 235)',
               backgroundColor: 'rgba(54, 162, 235, 0.2)',
               tension: 0.1,
+              pointBorderWidth: 0,
             },
           ],
         },
@@ -97,21 +101,17 @@ const Graphs = ({ activeFunction, functionInfo }: FunctionProps) => {
               data: priceData,
               borderColor: 'rgb(75, 192, 192)',
               tension: 0.1,
+              pointBorderWidth: 0,
             },
           ],
         },
         options: {
           responsive: true,
-          plugins: {
-            display: true,
-            text: 'Cost Over Time',
-          },
+          plugins: {},
         },
-      },
-      )
+      });
       charts.push(priceChart);
-    };
-
+    }
 
     //Calls
     if (callsChartRef.current) {
@@ -126,13 +126,13 @@ const Graphs = ({ activeFunction, functionInfo }: FunctionProps) => {
               backgroundColor: 'rgba(153, 102, 255, 0.6)',
               borderColor: 'rgb(153, 102, 255)',
               borderWidth: 1,
-            }],
+            },
+          ],
         },
         options: {
           responsive: true,
           plugins: {
             title: {
-
               display: true,
             },
           },
@@ -164,12 +164,16 @@ const Graphs = ({ activeFunction, functionInfo }: FunctionProps) => {
             <p className="text-xs text-gray-500">{activeFunction.name}</p>
           </div>
           <div>
-            <span className="text-sm font-semibold">Updated At</span>
-            <p className="text-xs text-gray-500">{activeFunction.updatedAt}</p>
+            <span className="text-sm font-semibold">Created At</span>
+            <p className="text-xs text-gray-500">
+              {format(activeFunction.createdAt || 0, 'dd/MM/yyyy HH:mm:ss') || 'N/A'}
+            </p>
           </div>
           <div>
-            <span className="text-sm font-semibold">Created At</span>
-            <p className="text-xs text-gray-500">{activeFunction.createdAt}</p>
+            <span className="text-sm font-semibold">Updated At</span>
+            <p className="text-xs text-gray-500">
+              {format(activeFunction.updatedAt || 0, 'dd/MM/yyyy HH:mm:ss') || 'N/A'}
+            </p>
           </div>
         </div>
       </div>
