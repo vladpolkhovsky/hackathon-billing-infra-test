@@ -4,6 +4,7 @@ import useTariffStore from '@/store/tariff';
 import { Button } from '@headlessui/react';
 import { useEffect, useState } from 'react';
 import AddTariffModal from './components/AddTariffModal';
+import { useUserStore } from '@/store';
 
 const TariffsRoute = () => {
   const { tariffs, setTariffs, setTariffError } = useTariffStore();
@@ -11,6 +12,7 @@ const TariffsRoute = () => {
     baseUrl: '/api/billing',
   });
   const [isOpenedAddTariffModal, setIsOpenedAddTariffModal] = useState(false);
+  const { user } = useUserStore();
 
   useEffect(() => {
     const getTariffs = async () => {
@@ -28,12 +30,14 @@ const TariffsRoute = () => {
       {isOpenedAddTariffModal && <AddTariffModal onClose={() => setIsOpenedAddTariffModal(false)} />}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold my-4">Tariffs</h1>
-        <Button
-          className="bg-blue-300 hover:bg-blue-400 px-4 py-2 rounded"
-          onClick={() => setIsOpenedAddTariffModal(true)}
-        >
-          Add tariff
-        </Button>
+        {user?.roles?.includes('SYSTEM_ADMIN') && (
+          <Button
+            className="bg-blue-300 hover:bg-blue-400 px-4 py-2 rounded"
+            onClick={() => setIsOpenedAddTariffModal(true)}
+          >
+            Add tariff
+          </Button>
+        )}
       </div>
       {tariffs.map((tariff) => (
         <div key={tariff.id} className="flex gap-4 py-4 mr-4 border-b last:border-b-0 border-gray-300 w-full">
