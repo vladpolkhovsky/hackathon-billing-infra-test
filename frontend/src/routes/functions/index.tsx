@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import createClient from 'openapi-fetch';
 import { paths } from '../../api';
 import { BillingFunction, BillingFunctionDetails } from '@/types';
@@ -40,7 +40,7 @@ const FunctionsRoute = () => {
             query: {
               functionId: activeFunction.id,
               tariffId: activeTariff.id,
-              period: 'MINUTE',
+              period: 'HOUR',
               from: Date.now() - 1000 * 60 * 60 * 24 * 15,
               to: Date.now() + 1000 * 60 * 60 * 24 * 5,
             },
@@ -50,7 +50,13 @@ const FunctionsRoute = () => {
           setFunctionInfo((res.data as BillingFunctionDetails) || null);
         });
     }
-  }, [activeFunction]);
+  }, [activeFunction, activeTariff]);
+
+  const handleTariffChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    console.log(value);
+    setActiveTariff(tariffs.find((t) => t.id === value) || null);
+  };
 
   return (
     <div className="w-full pr-4">
@@ -61,7 +67,7 @@ const FunctionsRoute = () => {
               <h1 className="text-3xl font-bold my-4">Functions</h1>
               <Select
                 value={activeTariff?.id}
-                onChange={(value) => setActiveTariff(tariffs.find((t) => t.id === (value as any)) || null)}
+                onChange={handleTariffChange}
                 className="w-64 bg-gray-100 hover:bg-gray-300 px-4 py-2 rounded"
               >
                 {tariffs.map((t) => (
