@@ -15,7 +15,39 @@
 
 ### ПРОЦЕСС ЗАПУСКА ФУНКЦИЙ
 * Можно запустить любую функцию, дополнительной настройки, которая требовала бы наша биллинг система не требется
-* Ручной запусе, стандартный для knative:
+* Ручной запусе, стандартный для knative.
+
+#### На примере loading-function
+1. Создается необходимый docker образ функции
+2. Необходимо создать yml файл. Шаблон:
+```
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: <service-name>
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "1"
+        autoscaling.knative.dev/maxScale: "5"
+        autoscaling.knative.dev/target: "50"
+        autoscaling.knative.dev/class: "kpa.autoscaling.knative.dev"
+        autoscaling.knative.dev/metric: "rps"
+        networking.knative.dev/ingress.class: "kourier.ingress.networking.knative.dev"
+    spec:
+      containers:
+        - image: <image-tag>:latest
+          ports:
+            - containerPort: <port>
+          env:
+            - name: EXAMPLE_ENV
+              value: "value"
+```
+3. После чего необходимо запустить команду `kubectl apply -f <service-filename>.yaml`, заменив service-filename на имя файла
+
+_В качестве примера см. папку loading-function_
 
 ## Запуск биллинг сервиса
 
@@ -23,7 +55,7 @@
 
 `docker compose up -d --force-recreate --build`
 
-### ЕСЛИ ВЫ ИЗМЕНИлИ ПОРТ ПРОМЕТУСА ТО ПОМЕНЯЙТЕ ЕГО В [docker-compose.yml](docker-compose.yml) настройка `metrics-collector.env.PROMETHEUS_URL` тут меняем нужный порт, если localhost
+### ЕСЛИ ВЫ ИЗМЕНИЛИ ПОРТ ПРОМЕТУСА ТО ПОМЕНЯЙТЕ ЕГО В [docker-compose.yml](docker-compose.yml) настройка `metrics-collector.env.PROMETHEUS_URL` тут меняем нужный порт, если localhost
 
 Для того чтобы удалить все данные с вольюмов:
 
