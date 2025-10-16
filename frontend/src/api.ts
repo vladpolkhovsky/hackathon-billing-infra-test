@@ -56,6 +56,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Логаут */
+        post: operations["signIn_1"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получения биллингов по функциям */
+        get: operations["getFunction_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/function": {
         parameters: {
             query?: never;
@@ -64,7 +98,24 @@ export interface paths {
             cookie?: never;
         };
         /** Получение списка функций */
-        get: operations["getFunction_1"];
+        get: operations["getFunction_2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/details": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Получения детального биллинга по функции */
+        get: operations["getDetails"];
         put?: never;
         post?: never;
         delete?: never;
@@ -158,6 +209,66 @@ export interface components {
             username?: string;
             password?: string;
         };
+        BillingRegistryDto: {
+            totalCpuAmount?: number;
+            totalCpuPrice?: number;
+            totalMemoryAmount?: number;
+            totalMemoryPrice?: number;
+            totalCallCount?: number;
+            totalCallPrice?: number;
+            totalPrice?: number;
+            /** Format: int64 */
+            metricsRecordsCount?: number;
+            function?: components["schemas"]["FunctionDto"];
+            tariff?: components["schemas"]["TariffDto"];
+            /** Format: date-time */
+            billingFrom?: string;
+            /** @enum {string} */
+            billingPeriod?: "MINUTE" | "HOUR" | "DAY" | "MONTH" | "YEAR";
+        };
+        FunctionDto: {
+            /** Format: uuid */
+            id?: string;
+            name?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        PageBillingRegistryDto: {
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            numberOfElements?: number;
+            /** Format: int32 */
+            size?: number;
+            content?: components["schemas"]["BillingRegistryDto"][];
+            /** Format: int32 */
+            number?: number;
+            sort?: components["schemas"]["SortObject"];
+            first?: boolean;
+            last?: boolean;
+            empty?: boolean;
+        };
+        PageableObject: {
+            /** Format: int32 */
+            pageNumber?: number;
+            paged?: boolean;
+            /** Format: int32 */
+            pageSize?: number;
+            unpaged?: boolean;
+            /** Format: int64 */
+            offset?: number;
+            sort?: components["schemas"]["SortObject"];
+        };
+        SortObject: {
+            unsorted?: boolean;
+            sorted?: boolean;
+            empty?: boolean;
+        };
         PageTariffDto: {
             /** Format: int64 */
             totalElements?: number;
@@ -176,31 +287,6 @@ export interface components {
             last?: boolean;
             empty?: boolean;
         };
-        PageableObject: {
-            unpaged?: boolean;
-            /** Format: int32 */
-            pageNumber?: number;
-            paged?: boolean;
-            /** Format: int32 */
-            pageSize?: number;
-            /** Format: int64 */
-            offset?: number;
-            sort?: components["schemas"]["SortObject"];
-        };
-        SortObject: {
-            unsorted?: boolean;
-            sorted?: boolean;
-            empty?: boolean;
-        };
-        FunctionDto: {
-            /** Format: uuid */
-            id?: string;
-            name?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-            /** Format: date-time */
-            createdAt?: string;
-        };
         PageFunctionDto: {
             /** Format: int64 */
             totalElements?: number;
@@ -218,6 +304,17 @@ export interface components {
             first?: boolean;
             last?: boolean;
             empty?: boolean;
+        };
+        BillingRecord: {
+            totalCpuAmount?: number;
+            totalCpuPrice?: number;
+            totalMemoryAmount?: number;
+            totalMemoryPrice?: number;
+            totalCallCount?: number;
+            totalCallPrice?: number;
+            totalPrice?: number;
+            /** Format: int64 */
+            metricsRecordsCount?: number;
         };
     };
     responses: never;
@@ -399,7 +496,89 @@ export interface operations {
             };
         };
     };
+    signIn_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+        };
+    };
     getFunction_1: {
+        parameters: {
+            query: {
+                /** @description Zero-based page index (0..N) */
+                page?: number;
+                /** @description The size of the page to be returned */
+                size?: number;
+                /** @description Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported. */
+                sort?: string[];
+                tariffId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageBillingRegistryDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+        };
+    };
+    getFunction_2: {
         parameters: {
             query?: {
                 /** @description Zero-based page index (0..N) */
@@ -422,6 +601,52 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PageFunctionDto"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BackendError"];
+                };
+            };
+        };
+    };
+    getDetails: {
+        parameters: {
+            query: {
+                functionId: string;
+                tariffId: string;
+                period: "MINUTE" | "HOUR" | "DAY" | "MONTH" | "YEAR";
+                /** @description Время в формате таймстампа c милисекундами */
+                from: number;
+                /** @description Время в формате таймстампа c милисекундами */
+                to: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingRecord"];
                 };
             };
             /** @description Bad Request */
